@@ -17,10 +17,10 @@ const TYPE_ICONS: Record<string, React.ReactNode> = {
 const TYPE_LABELS: Record<string, string> = {
   study: '스터디', club: '동아리', team: '팀원모집',
 }
-const TYPE_GRADIENT: Record<string, string> = {
-  study: 'from-indigo-700 via-indigo-600 to-violet-600',
-  club: 'from-purple-700 via-purple-600 to-pink-600',
-  team: 'from-blue-700 via-indigo-600 to-indigo-700',
+const TYPE_ACCENT: Record<string, string> = {
+  study: '#6366F1',
+  club: '#8B5CF6',
+  team: '#3B82F6',
 }
 
 export default async function PostDetailPage({
@@ -46,7 +46,7 @@ export default async function PostDetailPage({
   const isFull = spotsLeft <= 0
   const isClosed = isExpired || isFull
   const fillPct = Math.min(100, Math.round((post.current / post.capacity) * 100))
-  const gradient = TYPE_GRADIENT[post.type] ?? TYPE_GRADIENT.study
+  const accent = TYPE_ACCENT[post.type] ?? TYPE_ACCENT.study
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -59,29 +59,32 @@ export default async function PostDetailPage({
       />
 
       {/* ── HERO ── */}
-      <div className={`bg-gradient-to-br ${gradient} pt-10 pb-16 px-4`}>
-        <div className="max-w-5xl mx-auto">
+      <div className="bg-white border-b border-gray-100" style={{ borderTop: `5px solid ${accent}` }}>
+        <div className="max-w-5xl mx-auto px-4 pt-9 pb-10">
           {/* 배지 row */}
           <div className="flex items-center gap-2 mb-5 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 text-xs font-bold bg-white/20 text-white px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/30">
+            <span
+              className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full border"
+              style={{ color: accent, background: `${accent}12`, borderColor: `${accent}30` }}
+            >
               {TYPE_ICONS[post.type]} {TYPE_LABELS[post.type] ?? post.type}
             </span>
-            <span className="text-xs text-white/80 bg-white/15 px-3 py-1.5 rounded-full border border-white/20">
+            <span className="text-xs text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200">
               {post.field}
             </span>
             {isClosed ? (
-              <span className="text-xs bg-black/30 text-white/70 px-3 py-1.5 rounded-full font-medium border border-white/10">
+              <span className="text-xs bg-gray-100 text-gray-400 px-3 py-1.5 rounded-full font-medium">
                 {isExpired ? '기간만료' : '모집마감'}
               </span>
             ) : (
               <>
                 {daysLeft <= 3 && daysLeft >= 0 && (
-                  <span className="inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-full font-bold bg-red-500/90 text-white border border-red-400/50">
+                  <span className="inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-full font-bold bg-red-50 text-red-500 border border-red-200">
                     <IconFlame size={12} /> 마감임박
                   </span>
                 )}
                 {spotsLeft <= 2 && spotsLeft > 0 && (
-                  <span className="inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-full font-bold bg-amber-500/90 text-white border border-amber-400/50">
+                  <span className="inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-full font-bold bg-amber-50 text-amber-600 border border-amber-200">
                     <IconAlertCircle size={12} /> 자리 {spotsLeft}개
                   </span>
                 )}
@@ -90,35 +93,19 @@ export default async function PostDetailPage({
           </div>
 
           {/* 제목 */}
-          <h1 className="text-3xl md:text-4xl font-extrabold text-white leading-tight mb-6 tracking-tight">
+          <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight mb-3 tracking-tight">
             {post.title}
           </h1>
 
-          {/* 핵심 메타 */}
-          <div className="flex items-center gap-6 flex-wrap text-white/80 text-sm">
-            <span className="flex items-center gap-2">
-              <IconCalendar size={15} />
-              <span>
-                마감 {deadline.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}
-                {!isExpired && <span className="ml-1.5 font-semibold text-white">D-{daysLeft}</span>}
-              </span>
-            </span>
-            <span className="flex items-center gap-2">
-              <IconCount size={15} />
-              <span>
-                {post.current} / {post.capacity}명 참여중
-                <span className="ml-2 font-semibold text-white">{fillPct}%</span>
-              </span>
-            </span>
-            <span className="text-white/50 text-xs">
-              등록 {new Date(post.createdAt).toLocaleDateString('ko-KR')}
-            </span>
-          </div>
+          {/* 설명 미리보기 */}
+          <p className="text-gray-500 text-[15px] leading-relaxed line-clamp-3 max-w-2xl">
+            {post.description}
+          </p>
         </div>
       </div>
 
       {/* ── BODY ── */}
-      <div className="max-w-5xl mx-auto px-4 -mt-8 pb-16">
+      <div className="max-w-5xl mx-auto px-4 pt-8 pb-16">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-start">
 
           {/* ── 왼쪽: 메인 콘텐츠 ── */}
@@ -126,20 +113,15 @@ export default async function PostDetailPage({
 
             {/* 포스터 (동아리일 때) */}
             {post.type === 'club' && post.poster && (
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="px-6 pt-6 pb-2">
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">동아리 포스터</p>
-                </div>
-                <div className="flex items-center justify-center bg-gray-50 border-t border-gray-100">
-                  <Image
-                    src={post.poster}
-                    alt="동아리 포스터"
-                    width={900}
-                    height={700}
-                    className="w-full h-auto max-h-[520px] object-contain"
-                    style={{ display: 'block' }}
-                  />
-                </div>
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex items-center justify-center">
+                <Image
+                  src={post.poster}
+                  alt="동아리 포스터"
+                  width={900}
+                  height={700}
+                  className="w-full h-auto max-h-[520px] object-contain"
+                  style={{ display: 'block' }}
+                />
               </div>
             )}
 
