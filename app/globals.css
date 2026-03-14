@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #F6F0E6;
+  --foreground: #2C1A0E;
 }
 
 @theme inline {
@@ -10,12 +10,34 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Brand: Caramel Cognac — H=25°, 깔끔하고 맑은 따뜻한 브라운 */
+  --color-brand-50:  #FAF5F0;
+  --color-brand-100: #F4E8DC;
+  --color-brand-200: #E8D0BC;
+  --color-brand-300: #D4AC8A;
+  --color-brand-400: #BC8660;
+  --color-brand-500: #A06840;
+  --color-brand-600: #8B5A38;   /* Primary — 코냑 브라운 */
+  --color-brand-700: #6E4228;
+  --color-brand-800: #4E2C16;
+  --color-brand-900: #301808;
+
+  /* Semantic: 브랜드 팔레트와 같은 따뜻한 색조 계열 */
+  /* Urgency — 테라코타 (H=14°, 브라운에서 빨강 쪽으로 살짝) */
+  --color-urgent-text: #9E3A24;
+  --color-urgent-bg:   #F8EDEA;
+  --color-urgent-bar:  #C05540;
+
+  /* Warning — 웜 골드 (H=38°, 브라운에서 노랑 쪽으로 살짝) */
+  --color-warn-text: #8F6618;
+  --color-warn-bg:   #F8F2E0;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #1C110A;
+    --foreground: #EDE3D6;
   }
 }
 

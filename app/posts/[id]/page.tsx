@@ -39,7 +39,7 @@ export default async function PostDetailPage({
   const spotsLeft = post.capacity - post.current
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#F6F0E6]">
       <Header
         right={
           <Link href="/" className="text-sm text-gray-500 hover:text-gray-700">
@@ -49,7 +49,7 @@ export default async function PostDetailPage({
       />
 
       <main className="max-w-3xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-[#FDFAF5] rounded-2xl shadow-sm border border-[#E8DDD0] overflow-hidden">
           {post.type === 'club' && post.poster && (
             <div className="relative w-full h-64 bg-gray-100">
               <Image
@@ -63,16 +63,16 @@ export default async function PostDetailPage({
 
           <div className="p-6 md:p-8">
             <div className="flex items-center gap-2 mb-4 flex-wrap">
-              <span className="text-sm font-medium bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full">
+              <span className="text-sm font-medium bg-brand-100 text-brand-700 px-3 py-1 rounded-full">
                 {TYPE_ICONS[post.type]} {TYPE_LABELS[post.type] ?? post.type}
               </span>
               {daysLeft <= 3 && daysLeft >= 0 && (
-                <span className="text-sm bg-red-100 text-red-600 px-3 py-1 rounded-full font-medium">
+                <span className="text-sm px-3 py-1 rounded-full font-medium" style={{ color: 'var(--color-urgent-text)', background: 'var(--color-urgent-bg)' }}>
                   🔥 마감임박
                 </span>
               )}
               {spotsLeft <= 2 && spotsLeft > 0 && (
-                <span className="text-sm bg-orange-100 text-orange-600 px-3 py-1 rounded-full font-medium">
+                <span className="text-sm px-3 py-1 rounded-full font-medium" style={{ color: 'var(--color-warn-text)', background: 'var(--color-warn-bg)' }}>
                   ⚠ 자리 {spotsLeft}개 남음
                 </span>
               )}
@@ -85,7 +85,7 @@ export default async function PostDetailPage({
 
             <h1 className="text-2xl font-bold text-gray-900 mb-6">{post.title}</h1>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 p-4 bg-gray-50 rounded-xl">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 p-4 bg-brand-50 rounded-xl">
               <div>
                 <p className="text-xs text-gray-400 mb-1">분야</p>
                 <p className="font-medium text-gray-800">{post.field}</p>
@@ -98,7 +98,7 @@ export default async function PostDetailPage({
               </div>
               <div>
                 <p className="text-xs text-gray-400 mb-1">마감일</p>
-                <p className={`font-medium ${daysLeft <= 3 && daysLeft >= 0 ? 'text-red-500' : 'text-gray-800'}`}>
+                <p className="font-medium" style={daysLeft <= 3 && daysLeft >= 0 ? { color: 'var(--color-urgent-text)' } : { color: '#374151' }}>
                   {deadline.toLocaleDateString('ko-KR')}
                   {daysLeft >= 0 && ` (D-${daysLeft})`}
                 </p>
@@ -123,10 +123,10 @@ export default async function PostDetailPage({
                   {post.roles.map((role) => (
                     <div
                       key={role.id}
-                      className="flex items-center justify-between px-4 py-3 bg-purple-50 rounded-lg"
+                      className="flex items-center justify-between px-4 py-3 bg-brand-50 rounded-lg"
                     >
-                      <span className="font-medium text-purple-800">{role.name}</span>
-                      <span className="text-sm text-purple-600 bg-white px-2.5 py-1 rounded-full border border-purple-200">
+                      <span className="font-medium text-brand-800">{role.name}</span>
+                      <span className="text-sm text-brand-600 bg-white px-2.5 py-1 rounded-full border border-brand-200">
                         {role.count}명
                       </span>
                     </div>
@@ -138,7 +138,7 @@ export default async function PostDetailPage({
             <div className="flex justify-end">
               <Link
                 href="/"
-                className="px-5 py-2.5 border border-gray-200 text-gray-600 rounded-lg text-sm hover:bg-gray-50 transition-colors"
+                className="px-5 py-2.5 border border-[#E0D4C8] text-gray-600 rounded-lg text-sm hover:bg-brand-50 transition-colors"
               >
                 목록으로 돌아가기
               </Link>

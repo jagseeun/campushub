@@ -53,8 +53,8 @@ export default function FilterBar() {
         onClick={() => toggle(key, value)}
         className={`px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all ${
           active
-            ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm shadow-indigo-200'
-            : 'bg-white text-gray-500 border-gray-200 hover:border-indigo-300 hover:text-indigo-600'
+            ? 'bg-brand-600 text-white border-brand-600 shadow-sm shadow-brand-200'
+            : 'bg-[#FDFAF5] text-gray-500 border-[#E0D4C8] hover:border-brand-300 hover:text-brand-600'
         }`}
       >
         {label}

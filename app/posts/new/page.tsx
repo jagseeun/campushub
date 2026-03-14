@@ -78,13 +78,13 @@ export default function NewPostPage() {
   }
 
   const inputCls =
-    'w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400'
+    'w-full border border-[#E0D4C8] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-brand-400 bg-[#FDFAF5]'
   const labelCls = 'block text-sm font-medium text-gray-700 mb-1.5'
 
   const TYPE_LABELS = { study: '📚 스터디', club: '🏫 동아리', team: '👥 팀원모집' }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#F6F0E6]">
       <Header
         right={
           <Link href="/" className="text-sm text-gray-500 hover:text-gray-700">
@@ -94,7 +94,7 @@ export default function NewPostPage() {
       />
 
       <main className="max-w-2xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
+        <div className="bg-[#FDFAF5] rounded-2xl shadow-sm border border-[#E8DDD0] p-6 md:p-8">
           <h1 className="text-xl font-bold text-gray-900 mb-6">모집글 작성</h1>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -108,8 +108,8 @@ export default function NewPostPage() {
                     onClick={() => setType(t)}
                     className={`flex-1 py-2.5 rounded-lg text-sm font-medium border transition-all ${
                       type === t
-                        ? 'bg-indigo-600 text-white border-indigo-600'
-                        : 'bg-white text-gray-600 border-gray-200 hover:border-indigo-300'
+                        ? 'bg-brand-600 text-white border-brand-600'
+                        : 'bg-[#FDFAF5] text-gray-600 border-[#E0D4C8] hover:border-brand-300'
                     }`}
                   >
                     {TYPE_LABELS[t]}
@@ -197,7 +197,7 @@ export default function NewPostPage() {
             {type === 'team' && (
               <div>
                 <label className={labelCls}>모집 역할</label>
-                <div className="bg-gray-50 rounded-xl p-4 space-y-2.5">
+                <div className="bg-brand-50 rounded-xl p-4 space-y-2.5">
                   <div className="grid gap-2 px-0.5" style={{ gridTemplateColumns: '1fr 88px 32px' }}>
                     <span className="text-xs font-medium text-gray-400">역할명</span>
                     <span className="text-xs font-medium text-gray-400 text-center">인원수</span>
@@ -210,7 +210,7 @@ export default function NewPostPage() {
                         onChange={(e) => updateRole(role.id, 'name', e.target.value)}
                         placeholder="예: 프론트엔드"
                         required
-                        className="w-full border border-gray-200 bg-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400"
+                        className="w-full border border-[#E0D4C8] bg-[#FDFAF5] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-brand-400"
                       />
                       <div className="relative">
                         <input
@@ -218,7 +218,7 @@ export default function NewPostPage() {
                           value={role.count}
                           onChange={(e) => updateRole(role.id, 'count', Number(e.target.value))}
                           min={1}
-                          className="w-full border border-gray-200 bg-white rounded-lg px-3 py-2 pr-7 text-sm text-center focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400"
+                          className="w-full border border-[#E0D4C8] bg-[#FDFAF5] rounded-lg px-3 py-2 pr-7 text-sm text-center focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-brand-400"
                         />
                         <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 pointer-events-none">명</span>
                       </div>
@@ -236,7 +236,7 @@ export default function NewPostPage() {
                   <button
                     type="button"
                     onClick={addRole}
-                    className="text-sm text-indigo-500 hover:text-indigo-700 font-medium flex items-center gap-1 pt-1"
+                    className="text-sm text-brand-600 hover:text-brand-700 font-medium flex items-center gap-1 pt-1"
                   >
                     + 역할 추가
                   </button>
@@ -260,14 +260,14 @@ export default function NewPostPage() {
             <div className="flex gap-3 pt-2">
               <Link
                 href="/"
-                className="flex-1 py-3 border border-gray-200 text-gray-600 rounded-lg text-sm font-medium text-center hover:bg-gray-50 transition-colors"
+                className="flex-1 py-3 border border-[#E0D4C8] text-gray-600 rounded-lg text-sm font-medium text-center hover:bg-brand-50 transition-colors"
               >
                 취소
               </Link>
               <button
                 type="submit"
                 disabled={submitting}
-                className="flex-1 py-3 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+                className="flex-1 py-3 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 disabled:opacity-50 transition-colors"
               >
                 {submitting ? '제출 중...' : '모집글 등록'}
               </button>

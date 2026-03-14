@@ -33,7 +33,7 @@ export default function PostCard({ post }: { post: Post }) {
 
   return (
     <Link href={`/posts/${post.id}`}>
-      <div className="group bg-white rounded-2xl border border-gray-100 p-5 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-50 transition-all duration-200 h-full flex flex-col">
+      <div className="group bg-[#FDFAF5] rounded-2xl border border-[#E8DDD0] p-5 hover:border-brand-200 hover:shadow-xl hover:shadow-brand-50 transition-all duration-200 h-full flex flex-col">
 
         {/* Top row: type badge + status */}
         <div className="flex items-center justify-between mb-4">
@@ -46,10 +46,10 @@ export default function PostCard({ post }: { post: Post }) {
             ) : (
               <>
                 {isDeadlineSoon && (
-                  <span className="text-xs text-rose-500 bg-rose-50 px-2.5 py-1 rounded-full font-bold">D-{daysLeft}</span>
+                  <span className="text-xs px-2.5 py-1 rounded-full font-bold" style={{ color: 'var(--color-urgent-text)', background: 'var(--color-urgent-bg)' }}>D-{daysLeft}</span>
                 )}
                 {isSpotsSoon && (
-                  <span className="text-xs text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full font-medium">{spotsLeft}자리</span>
+                  <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ color: 'var(--color-warn-text)', background: 'var(--color-warn-bg)' }}>{spotsLeft}자리</span>
                 )}
               </>
             )}
@@ -83,14 +83,14 @@ export default function PostCard({ post }: { post: Post }) {
           <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
             <div
               className={`h-full rounded-full transition-all ${
-                isFull ? 'bg-gray-300' : fillPct >= 80 ? 'bg-rose-400' : 'bg-indigo-500'
+                isFull ? 'bg-[#D4C4B8]' : fillPct >= 80 ? 'bg-[var(--color-urgent-bar)]' : 'bg-brand-500'
               }`}
               style={{ width: `${fillPct}%` }}
             />
           </div>
 
           {/* Deadline */}
-          <p className={`text-xs ${isDeadlineSoon && !isFull ? 'text-rose-500 font-semibold' : 'text-gray-400'}`}>
+          <p className={`text-xs ${isDeadlineSoon && !isFull ? 'font-semibold' : 'text-gray-400'}`} style={isDeadlineSoon && !isFull ? { color: 'var(--color-urgent-text)' } : undefined}>
             📅 {formattedDeadline} 마감
             {!isFull && daysLeft >= 0 && !isDeadlineSoon && ` · D-${daysLeft}`}
           </p>
