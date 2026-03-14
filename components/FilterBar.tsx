@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback } from 'react'
+import { IconFlame, IconZap, IconBuilding, IconBook, IconUsers } from './Icons'
 
 const FIELDS = ['개발', '디자인', '기획', '마케팅', '데이터', '기타']
 
@@ -43,18 +44,18 @@ export default function FilterBar() {
     router.push(buildQuery({ [key]: current === value ? null : value }))
   }
 
-  const chip = (key: FilterKey, value: string, label: string) => {
+  const chip = (key: FilterKey, value: string, label: React.ReactNode) => {
     const current =
       key === 'type' ? currentType : key === 'filter' ? currentFilter : currentField
     const active = current === value
     return (
       <button
-        key={value}
+        key={String(value)}
         onClick={() => toggle(key, value)}
-        className={`px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+        className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all ${
           active
             ? 'bg-brand-600 text-white border-brand-600 shadow-sm shadow-brand-200'
-            : 'bg-[#FDFAF5] text-gray-500 border-[#E0D4C8] hover:border-brand-300 hover:text-brand-600'
+            : 'bg-white text-gray-500 border-gray-200 hover:border-brand-300 hover:text-brand-600'
         }`}
       >
         {label}
@@ -65,12 +66,12 @@ export default function FilterBar() {
   return (
     <div className="space-y-2.5">
       <div className="flex flex-wrap gap-2">
-        {chip('filter', 'deadline_soon', '🔥 마감임박')}
-        {chip('filter', 'spots_soon', '⚡ 인원마감임박')}
+        {chip('filter', 'deadline_soon', <><IconFlame size={12} />마감임박</>)}
+        {chip('filter', 'spots_soon', <><IconZap size={12} />인원마감임박</>)}
         <span className="w-px bg-gray-200 self-stretch mx-1" />
-        {chip('type', 'club', '🏫 동아리')}
-        {chip('type', 'study', '📚 스터디')}
-        {chip('type', 'team', '👥 팀원모집')}
+        {chip('type', 'club', <><IconBuilding size={12} />동아리</>)}
+        {chip('type', 'study', <><IconBook size={12} />스터디</>)}
+        {chip('type', 'team', <><IconUsers size={12} />팀원모집</>)}
       </div>
       <div className="flex flex-wrap gap-2 items-center">
         <span className="text-xs text-gray-300 font-medium">분야</span>

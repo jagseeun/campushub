@@ -4,6 +4,7 @@ import PostCard from '@/components/PostCard'
 import FilterBar from '@/components/FilterBar'
 import SearchBar from '@/components/SearchBar'
 import Header from '@/components/Header'
+import { IconPlus, IconSearch } from '@/components/Icons'
 import { prisma } from '@/lib/prisma'
 import { POST_TYPES, FIELDS } from '@/types'
 import { Prisma } from '@prisma/client'
@@ -55,26 +56,27 @@ export default async function HomePage({
   const isFiltered = !!(params.type || params.field || params.filter || params.q)
 
   return (
-    <div className="min-h-screen bg-[#F6F0E6]">
+    <div className="min-h-screen bg-[#F8F9FF]">
       <Header
         right={
           <Link
             href="/posts/new"
-            className="bg-brand-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-brand-700 transition-colors shadow-sm shadow-brand-200"
+            className="inline-flex items-center gap-1.5 bg-brand-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-brand-700 transition-colors shadow-sm shadow-brand-200"
           >
-            + 모집글 작성
+            <IconPlus size={14} />
+            모집글 작성
           </Link>
         }
       />
 
       <main className="max-w-6xl mx-auto px-4 pb-16">
         {/* Hero */}
-        <div className="relative bg-gradient-to-br from-brand-900 via-brand-800 to-brand-600 rounded-3xl overflow-hidden mt-6 mb-6 px-8 py-10">
+        <div className="relative bg-gradient-to-br from-brand-900 via-brand-700 to-brand-500 rounded-3xl overflow-hidden mt-6 mb-6 px-8 py-10">
           <div
-            className="absolute inset-0 opacity-15"
+            className="absolute inset-0 opacity-20"
             style={{
               backgroundImage:
-                'radial-gradient(ellipse at 90% 10%, #C2A484 0%, transparent 55%), radial-gradient(ellipse at 10% 90%, #F0E6DA 0%, transparent 40%)',
+                'radial-gradient(ellipse at 90% 10%, #A5B4FC 0%, transparent 55%), radial-gradient(ellipse at 10% 90%, #C7D2FE 0%, transparent 40%)',
             }}
           />
           <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
@@ -107,7 +109,7 @@ export default async function HomePage({
         {/* Grid */}
         {posts.length === 0 ? (
           <div className="text-center py-24">
-            <p className="text-5xl mb-4">🔍</p>
+            <IconSearch size={48} className="text-gray-300 mx-auto mb-4" />
             <p className="text-lg font-bold text-gray-700 mb-1">결과가 없어요</p>
             <p className="text-sm text-gray-400">다른 키워드나 필터를 시도해보세요</p>
             {isFiltered && (

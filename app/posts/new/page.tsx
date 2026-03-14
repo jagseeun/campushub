@@ -4,10 +4,11 @@ import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/Header'
+import { IconArrowLeft, IconPlus, IconX, IconBook, IconBuilding, IconUsers, IconUpload } from '@/components/Icons'
 import { POST_TYPES, FIELDS } from '@/types'
 
 type Role = {
-  id: string // 안정적인 key용
+  id: string
   name: string
   count: number
 }
@@ -17,7 +18,9 @@ export default function NewPostPage() {
   const roleIdCounter = useRef(0)
   const newRole = (): Role => ({ id: String(++roleIdCounter.current), name: '', count: 1 })
   const [submitting, setSubmitting] = useState(false)
+  const [uploadingImage, setUploadingImage] = useState(false)
   const [type, setType] = useState<'club' | 'study' | 'team'>('study')
+  const [posterPreview, setPosterPreview] = useState<string | null>(null)
   const [roles, setRoles] = useState<Role[]>([newRole()])
   const [form, setForm] = useState({
     title: '',
@@ -34,6 +37,31 @@ export default function NewPostPage() {
   ) => {
     const { name, value } = e.target
     setForm((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handlePosterUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploadingImage(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const res = await fetch('/api/upload', { method: 'POST', body: formData })
+      if (!res.ok) {
+        const err = await res.json()
+        alert(err.error ?? '업로드에 실패했습니다.')
+        return
+      }
+      const { url } = await res.json()
+      setForm((prev) => ({ ...prev, poster: url }))
+      setPosterPreview(url)
+    } catch {
+      alert('업로드 중 오류가 발생했습니다.')
+    } finally {
+      setUploadingImage(false)
+    }
   }
 
   const addRole = () => setRoles((prev) => [...prev, newRole()])
@@ -78,41 +106,46 @@ export default function NewPostPage() {
   }
 
   const inputCls =
-    'w-full border border-[#E0D4C8] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-brand-400 bg-[#FDFAF5]'
+    'w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-brand-400 bg-white'
   const labelCls = 'block text-sm font-medium text-gray-700 mb-1.5'
 
-  const TYPE_LABELS = { study: '📚 스터디', club: '🏫 동아리', team: '👥 팀원모집' }
+  const TYPE_OPTIONS = [
+    { value: 'study', label: '스터디', icon: <IconBook size={15} /> },
+    { value: 'club', label: '동아리', icon: <IconBuilding size={15} /> },
+    { value: 'team', label: '팀원모집', icon: <IconUsers size={15} /> },
+  ] as const
 
   return (
-    <div className="min-h-screen bg-[#F6F0E6]">
+    <div className="min-h-screen bg-[#F8F9FF]">
       <Header
         right={
-          <Link href="/" className="text-sm text-gray-500 hover:text-gray-700">
-            ← 취소
+          <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700">
+            <IconArrowLeft size={14} />
+            취소
           </Link>
         }
       />
 
       <main className="max-w-2xl mx-auto px-4 py-8">
-        <div className="bg-[#FDFAF5] rounded-2xl shadow-sm border border-[#E8DDD0] p-6 md:p-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-indigo-100 p-6 md:p-8">
           <h1 className="text-xl font-bold text-gray-900 mb-6">모집글 작성</h1>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className={labelCls}>모집 유형</label>
               <div className="flex gap-2">
-                {POST_TYPES.map((t) => (
+                {TYPE_OPTIONS.map((t) => (
                   <button
-                    key={t}
+                    key={t.value}
                     type="button"
-                    onClick={() => setType(t)}
-                    className={`flex-1 py-2.5 rounded-lg text-sm font-medium border transition-all ${
-                      type === t
+                    onClick={() => setType(t.value)}
+                    className={`flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-sm font-medium border transition-all ${
+                      type === t.value
                         ? 'bg-brand-600 text-white border-brand-600'
-                        : 'bg-[#FDFAF5] text-gray-600 border-[#E0D4C8] hover:border-brand-300'
+                        : 'bg-white text-gray-600 border-gray-200 hover:border-brand-300'
                     }`}
                   >
-                    {TYPE_LABELS[t]}
+                    {t.icon}{t.label}
                   </button>
                 ))}
               </div>
@@ -183,14 +216,38 @@ export default function NewPostPage() {
 
             {type === 'club' && (
               <div>
-                <label className={labelCls}>포스터 이미지 URL (선택)</label>
-                <input
-                  name="poster"
-                  value={form.poster}
-                  onChange={handleChange}
-                  placeholder="https://..."
-                  className={inputCls}
-                />
+                <label className={labelCls}>포스터 이미지 (선택)</label>
+                {posterPreview ? (
+                  <div className="relative">
+                    <img src={posterPreview} alt="포스터 미리보기" className="w-full h-48 object-cover rounded-lg border border-gray-200" />
+                    <button
+                      type="button"
+                      onClick={() => { setPosterPreview(null); setForm((p) => ({ ...p, poster: '' })) }}
+                      className="absolute top-2 right-2 bg-white rounded-full p-1 shadow hover:bg-gray-50"
+                    >
+                      <IconX size={14} className="text-gray-500" />
+                    </button>
+                  </div>
+                ) : (
+                  <label className={`${inputCls} flex flex-col items-center justify-center h-32 cursor-pointer border-dashed hover:border-brand-300 hover:bg-brand-50 transition-colors`}>
+                    {uploadingImage ? (
+                      <span className="text-sm text-gray-500">업로드 중...</span>
+                    ) : (
+                      <>
+                        <IconUpload size={24} className="text-gray-400 mb-2" />
+                        <span className="text-sm text-gray-500">클릭하여 이미지 업로드</span>
+                        <span className="text-xs text-gray-400 mt-1">JPG, PNG, GIF, WEBP · 최대 5MB</span>
+                      </>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePosterUpload}
+                      className="hidden"
+                      disabled={uploadingImage}
+                    />
+                  </label>
+                )}
               </div>
             )}
 
@@ -210,7 +267,7 @@ export default function NewPostPage() {
                         onChange={(e) => updateRole(role.id, 'name', e.target.value)}
                         placeholder="예: 프론트엔드"
                         required
-                        className="w-full border border-[#E0D4C8] bg-[#FDFAF5] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-brand-400"
+                        className="w-full border border-gray-200 bg-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-brand-400"
                       />
                       <div className="relative">
                         <input
@@ -218,7 +275,7 @@ export default function NewPostPage() {
                           value={role.count}
                           onChange={(e) => updateRole(role.id, 'count', Number(e.target.value))}
                           min={1}
-                          className="w-full border border-[#E0D4C8] bg-[#FDFAF5] rounded-lg px-3 py-2 pr-7 text-sm text-center focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-brand-400"
+                          className="w-full border border-gray-200 bg-white rounded-lg px-3 py-2 pr-7 text-sm text-center focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-brand-400"
                         />
                         <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 pointer-events-none">명</span>
                       </div>
@@ -226,9 +283,9 @@ export default function NewPostPage() {
                         <button
                           type="button"
                           onClick={() => removeRole(role.id)}
-                          className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-300 hover:text-red-400 hover:bg-red-50 transition-colors text-lg leading-none"
+                          className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-300 hover:text-red-400 hover:bg-red-50 transition-colors"
                         >
-                          ×
+                          <IconX size={14} />
                         </button>
                       ) : <span />}
                     </div>
@@ -236,9 +293,9 @@ export default function NewPostPage() {
                   <button
                     type="button"
                     onClick={addRole}
-                    className="text-sm text-brand-600 hover:text-brand-700 font-medium flex items-center gap-1 pt-1"
+                    className="inline-flex items-center gap-1 text-sm text-brand-600 hover:text-brand-700 font-medium pt-1"
                   >
-                    + 역할 추가
+                    <IconPlus size={14} />역할 추가
                   </button>
                 </div>
               </div>
@@ -260,7 +317,7 @@ export default function NewPostPage() {
             <div className="flex gap-3 pt-2">
               <Link
                 href="/"
-                className="flex-1 py-3 border border-[#E0D4C8] text-gray-600 rounded-lg text-sm font-medium text-center hover:bg-brand-50 transition-colors"
+                className="flex-1 py-3 border border-gray-200 text-gray-600 rounded-lg text-sm font-medium text-center hover:bg-gray-50 transition-colors"
               >
                 취소
               </Link>

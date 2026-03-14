@@ -2,12 +2,14 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Header from '@/components/Header'
+import ApplyForm from '@/components/ApplyForm'
+import { IconArrowLeft, IconBook, IconBuilding, IconUsers, IconFlame, IconAlertCircle, IconCalendar } from '@/components/Icons'
 import { prisma } from '@/lib/prisma'
 
-const TYPE_ICONS: Record<string, string> = {
-  study: '📚',
-  club: '🏫',
-  team: '👥',
+const TYPE_ICONS: Record<string, React.ReactNode> = {
+  study: <IconBook size={14} />,
+  club: <IconBuilding size={14} />,
+  team: <IconUsers size={14} />,
 }
 
 const TYPE_LABELS: Record<string, string> = {
@@ -37,19 +39,23 @@ export default async function PostDetailPage({
   const deadline = new Date(post.deadline)
   const daysLeft = Math.ceil((deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
   const spotsLeft = post.capacity - post.current
+  const isExpired = daysLeft < 0
+  const isFull = spotsLeft <= 0
+  const isClosed = isExpired || isFull
 
   return (
-    <div className="min-h-screen bg-[#F6F0E6]">
+    <div className="min-h-screen bg-[#F8F9FF]">
       <Header
         right={
-          <Link href="/" className="text-sm text-gray-500 hover:text-gray-700">
-            ← 목록으로
+          <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700">
+            <IconArrowLeft size={14} />
+            목록으로
           </Link>
         }
       />
 
       <main className="max-w-3xl mx-auto px-4 py-8">
-        <div className="bg-[#FDFAF5] rounded-2xl shadow-sm border border-[#E8DDD0] overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-sm border border-indigo-100 overflow-hidden">
           {post.type === 'club' && post.poster && (
             <div className="relative w-full h-64 bg-gray-100">
               <Image
@@ -63,23 +69,26 @@ export default async function PostDetailPage({
 
           <div className="p-6 md:p-8">
             <div className="flex items-center gap-2 mb-4 flex-wrap">
-              <span className="text-sm font-medium bg-brand-100 text-brand-700 px-3 py-1 rounded-full">
+              <span className="inline-flex items-center gap-1.5 text-sm font-medium bg-brand-100 text-brand-700 px-3 py-1 rounded-full">
                 {TYPE_ICONS[post.type]} {TYPE_LABELS[post.type] ?? post.type}
               </span>
-              {daysLeft <= 3 && daysLeft >= 0 && (
-                <span className="text-sm px-3 py-1 rounded-full font-medium" style={{ color: 'var(--color-urgent-text)', background: 'var(--color-urgent-bg)' }}>
-                  🔥 마감임박
-                </span>
-              )}
-              {spotsLeft <= 2 && spotsLeft > 0 && (
-                <span className="text-sm px-3 py-1 rounded-full font-medium" style={{ color: 'var(--color-warn-text)', background: 'var(--color-warn-bg)' }}>
-                  ⚠ 자리 {spotsLeft}개 남음
-                </span>
-              )}
-              {spotsLeft <= 0 && (
+              {isClosed ? (
                 <span className="text-sm bg-gray-100 text-gray-500 px-3 py-1 rounded-full font-medium">
-                  모집 마감
+                  {isExpired ? '기간만료' : '모집마감'}
                 </span>
+              ) : (
+                <>
+                  {daysLeft <= 3 && daysLeft >= 0 && (
+                    <span className="inline-flex items-center gap-1 text-sm px-3 py-1 rounded-full font-medium" style={{ color: 'var(--color-urgent-text)', background: 'var(--color-urgent-bg)' }}>
+                      <IconFlame size={14} /> 마감임박
+                    </span>
+                  )}
+                  {spotsLeft <= 2 && spotsLeft > 0 && (
+                    <span className="inline-flex items-center gap-1 text-sm px-3 py-1 rounded-full font-medium" style={{ color: 'var(--color-warn-text)', background: 'var(--color-warn-bg)' }}>
+                      <IconAlertCircle size={14} /> 자리 {spotsLeft}개 남음
+                    </span>
+                  )}
+                </>
               )}
             </div>
 
@@ -98,7 +107,8 @@ export default async function PostDetailPage({
               </div>
               <div>
                 <p className="text-xs text-gray-400 mb-1">마감일</p>
-                <p className="font-medium" style={daysLeft <= 3 && daysLeft >= 0 ? { color: 'var(--color-urgent-text)' } : { color: '#374151' }}>
+                <p className="font-medium flex items-center gap-1" style={daysLeft <= 3 && daysLeft >= 0 ? { color: 'var(--color-urgent-text)' } : { color: '#374151' }}>
+                  <IconCalendar size={13} />
                   {deadline.toLocaleDateString('ko-KR')}
                   {daysLeft >= 0 && ` (D-${daysLeft})`}
                 </p>
@@ -135,14 +145,12 @@ export default async function PostDetailPage({
               </div>
             )}
 
-            <div className="flex justify-end">
-              <Link
-                href="/"
-                className="px-5 py-2.5 border border-[#E0D4C8] text-gray-600 rounded-lg text-sm hover:bg-brand-50 transition-colors"
-              >
-                목록으로 돌아가기
-              </Link>
-            </div>
+            <ApplyForm
+              postId={post.id}
+              roles={post.roles}
+              isTeam={post.type === 'team'}
+              isClosed={isClosed}
+            />
           </div>
         </div>
       </main>

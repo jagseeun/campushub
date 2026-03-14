@@ -7,17 +7,18 @@ datasource db {
 }
 
 model Post {
-  id          Int      @id @default(autoincrement())
-  type        String   // "club" | "study" | "team"
-  title       String
-  field       String
-  poster      String?
-  capacity    Int
-  current     Int      @default(0)
-  deadline    DateTime
-  description String
-  roles       Role[]
-  createdAt   DateTime @default(now())
+  id           Int           @id @default(autoincrement())
+  type         String        // "club" | "study" | "team"
+  title        String
+  field        String
+  poster       String?
+  capacity     Int
+  current      Int           @default(0)
+  deadline     DateTime
+  description  String
+  roles        Role[]
+  applications Application[]
+  createdAt    DateTime      @default(now())
 }
 
 model Role {
@@ -26,4 +27,15 @@ model Role {
   count  Int
   postId Int
   post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model Application {
+  id         Int      @id @default(autoincrement())
+  postId     Int
+  post       Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  name       String
+  contact    String
+  roleWanted String?
+  message    String
+  createdAt  DateTime @default(now())
 }
