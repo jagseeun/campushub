@@ -107,11 +107,9 @@ export default async function PostDetailPage({
           <div className="space-y-6">
 
             {/* 설명 */}
-            <div className="bg-white rounded-2xl border border-gray-200 p-8">
-              <p className="text-gray-700 text-[16px] leading-[1.9] whitespace-pre-wrap">
-                {post.description}
-              </p>
-            </div>
+            <p className="text-gray-700 text-[16px] leading-[1.9] whitespace-pre-wrap px-1">
+              {post.description}
+            </p>
 
             {/* 포스터 (동아리) */}
             {post.type === 'club' && post.poster && (
