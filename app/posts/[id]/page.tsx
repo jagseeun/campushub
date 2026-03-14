@@ -47,6 +47,7 @@ export default async function PostDetailPage({
   const isClosed  = isExpired || isFull
   const fillPct   = Math.min(100, Math.round((post.current / post.capacity) * 100))
   const accent    = TYPE_ACCENT[post.type] ?? TYPE_ACCENT.study
+  const hasLeftContent = (post.type === 'club' && !!post.poster) || (post.type === 'team' && post.roles.length > 0)
 
   return (
     <div className="min-h-screen bg-[#F5F6FA]">
@@ -104,51 +105,56 @@ export default async function PostDetailPage({
         </div>
       </div>
 
-      {/* ── 본문: 2컬럼 ── */}
+      {/* ── 본문 ── */}
       <div className="max-w-5xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start">
+        <div className={hasLeftContent
+          ? 'grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start'
+          : 'flex justify-center'
+        }>
 
-          {/* ── 왼쪽 콘텐츠 ── */}
-          <div className="space-y-6">
+          {/* ── 왼쪽 콘텐츠 (포스터/역할 있을 때만) ── */}
+          {hasLeftContent && (
+            <div className="space-y-6">
 
-            {/* 포스터 (동아리) */}
-            {post.type === 'club' && post.poster && (
-              <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-                <Image
-                  src={post.poster}
-                  alt="포스터"
-                  width={800}
-                  height={1000}
-                  className="w-full h-auto max-h-[500px] object-contain"
-                  style={{ display: 'block' }}
-                />
-              </div>
-            )}
-
-            {/* 모집 역할 (팀) */}
-            {post.type === 'team' && post.roles.length > 0 && (
-              <div className="bg-white rounded-2xl border border-gray-200 p-7">
-                <p className="text-sm font-bold text-gray-400 tracking-widest uppercase mb-5">모집 역할</p>
-                <div className="space-y-3">
-                  {post.roles.map((role) => (
-                    <div
-                      key={role.id}
-                      className="flex items-center justify-between px-5 py-4 rounded-xl border"
-                      style={{ borderColor: `${accent}30`, background: `${accent}08` }}
-                    >
-                      <span className="font-semibold text-gray-800 text-[15px]">{role.name}</span>
-                      <span className="text-sm font-bold px-3 py-1 rounded-full bg-white border shadow-sm" style={{ color: accent, borderColor: `${accent}30` }}>
-                        {role.count}명 모집
-                      </span>
-                    </div>
-                  ))}
+              {/* 포스터 (동아리) */}
+              {post.type === 'club' && post.poster && (
+                <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+                  <Image
+                    src={post.poster}
+                    alt="포스터"
+                    width={800}
+                    height={1000}
+                    className="w-full h-auto max-h-[500px] object-contain"
+                    style={{ display: 'block' }}
+                  />
                 </div>
-              </div>
-            )}
-          </div>
+              )}
 
-          {/* ── 오른쪽 스티키 카드 ── */}
-          <div className="lg:sticky lg:top-6 space-y-4">
+              {/* 모집 역할 (팀) */}
+              {post.type === 'team' && post.roles.length > 0 && (
+                <div className="bg-white rounded-2xl border border-gray-200 p-7">
+                  <p className="text-sm font-bold text-gray-400 tracking-widest uppercase mb-5">모집 역할</p>
+                  <div className="space-y-3">
+                    {post.roles.map((role) => (
+                      <div
+                        key={role.id}
+                        className="flex items-center justify-between px-5 py-4 rounded-xl border"
+                        style={{ borderColor: `${accent}30`, background: `${accent}08` }}
+                      >
+                        <span className="font-semibold text-gray-800 text-[15px]">{role.name}</span>
+                        <span className="text-sm font-bold px-3 py-1 rounded-full bg-white border shadow-sm" style={{ color: accent, borderColor: `${accent}30` }}>
+                          {role.count}명 모집
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── 오른쪽/중앙 카드 ── */}
+          <div className={`space-y-4 ${hasLeftContent ? 'lg:sticky lg:top-6' : 'w-full max-w-xl'}`}>
 
             {/* 모집 정보 */}
             <div className="bg-white rounded-2xl border border-gray-200 p-6">
