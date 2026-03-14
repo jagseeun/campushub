@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Post {
+  id          Int      @id @default(autoincrement())
+  type        String   // "club" | "study" | "team"
+  title       String
+  field       String
+  poster      String?
+  capacity    Int
+  current     Int      @default(0)
+  deadline    DateTime
+  description String
+  roles       Role[]
+  createdAt   DateTime @default(now())
+}
+
+model Role {
+  id     Int    @id @default(autoincrement())
+  name   String
+  count  Int
+  postId Int
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
