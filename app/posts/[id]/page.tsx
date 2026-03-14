@@ -64,7 +64,7 @@ export default async function PostDetailPage({
       {/* ── 메인 패널 (한 화면에 핵심 정보 전부) ── */}
       <div className="bg-white border-b border-gray-100">
         <div className="max-w-5xl mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-10 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-10 items-end">
 
             {/* ── 왼쪽: 포스트 정보 ── */}
             <div>
@@ -105,13 +105,27 @@ export default async function PostDetailPage({
               </h1>
 
               {/* 설명 */}
-              <p className="text-gray-600 text-[15px] leading-relaxed whitespace-pre-wrap">
+              <p className="text-gray-600 text-[15px] leading-relaxed whitespace-pre-wrap mb-5">
                 {post.description}
               </p>
 
+              {/* 포스터 (동아리, 설명 바로 아래) */}
+              {post.type === 'club' && post.poster && (
+                <div className="rounded-xl border border-gray-100 overflow-hidden bg-gray-50">
+                  <Image
+                    src={post.poster}
+                    alt="동아리 포스터"
+                    width={800}
+                    height={600}
+                    className="w-full object-contain max-h-56"
+                    style={{ display: 'block' }}
+                  />
+                </div>
+              )}
+
               {/* 모집 역할 (team) */}
               {post.type === 'team' && post.roles.length > 0 && (
-                <div className="mt-7">
+                <div>
                   <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">모집 역할</p>
                   <div className="flex flex-wrap gap-2">
                     {post.roles.map((role) => (
@@ -129,8 +143,8 @@ export default async function PostDetailPage({
               )}
             </div>
 
-            {/* ── 오른쪽: 메타 + 지원 ── */}
-            <div className="space-y-3 lg:sticky lg:top-6">
+            {/* ── 오른쪽: 메타 + 지원 (하단 정렬) ── */}
+            <div className="space-y-3">
 
               {/* 모집 현황 */}
               <div className="rounded-2xl border border-gray-100 bg-gray-50 p-5">
@@ -216,21 +230,6 @@ export default async function PostDetailPage({
         </div>
       </div>
 
-      {/* ── 포스터 (동아리, 스크롤 영역) ── */}
-      {post.type === 'club' && post.poster && (
-        <div className="max-w-5xl mx-auto px-4 py-6">
-          <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-            <Image
-              src={post.poster}
-              alt="동아리 포스터"
-              width={960}
-              height={720}
-              className="w-full h-auto object-contain"
-              style={{ display: 'block' }}
-            />
-          </div>
-        </div>
-      )}
     </div>
   )
 }
