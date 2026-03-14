@@ -1,36 +1,103 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CampusHub
 
-## Getting Started
+캠퍼스 내 동아리, 스터디, 팀원 모집을 위한 커뮤니티 플랫폼입니다.
 
-First, run the development server:
+## 주요 기능
+
+- **동아리 모집** - 동아리 홍보 및 부원 모집
+- **스터디 모집** - 스터디 그룹 생성 및 모집
+- **팀원 모집** - 프로젝트/대회 팀원 모집 (역할별 인원 설정)
+- 모집 유형, 분야별 필터링
+- 마감 임박 / 인원 마감 임박 알림
+- 제목·설명 전체 검색
+
+## 기술 스택
+
+| 구분 | 기술 |
+|------|------|
+| Frontend | Next.js 16, React 19, TypeScript, Tailwind CSS 4 |
+| Backend | Next.js API Routes |
+| ORM | Prisma 7 |
+| Database | PostgreSQL |
+
+## 시작하기
+
+### 사전 요구사항
+
+- Node.js 18+
+- PostgreSQL
+
+### 설치
+
+```bash
+git clone https://github.com/jagseeun/campushub.git
+cd campushub
+npm install
+```
+
+### 환경변수 설정
+
+`.env` 파일을 생성하고 아래 내용을 입력합니다.
+
+```env
+DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/campushub"
+```
+
+### 데이터베이스 설정
+
+```bash
+# 마이그레이션 실행
+npx prisma migrate dev
+
+# 샘플 데이터 삽입 (선택)
+npx ts-node prisma/seed.ts
+```
+
+### 개발 서버 실행
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`http://localhost:3000` 에서 확인할 수 있습니다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 프로젝트 구조
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+campushub/
+├── app/
+│   ├── page.tsx              # 홈 (모집글 목록)
+│   ├── api/posts/            # REST API
+│   └── posts/
+│       ├── new/              # 모집글 작성
+│       └── [id]/             # 모집글 상세
+├── components/
+│   ├── Header.tsx
+│   ├── PostCard.tsx
+│   ├── FilterBar.tsx
+│   └── SearchBar.tsx
+├── lib/
+│   └── prisma.ts
+├── types/
+│   └── index.ts
+└── prisma/
+    ├── schema.prisma
+    └── seed.ts
+```
 
-## Learn More
+## API
 
-To learn more about Next.js, take a look at the following resources:
+| Method | Endpoint | 설명 |
+|--------|----------|------|
+| GET | `/api/posts` | 모집글 목록 조회 |
+| POST | `/api/posts` | 모집글 작성 |
+| GET | `/api/posts/[id]` | 모집글 상세 조회 |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### GET /api/posts 쿼리 파라미터
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| 파라미터 | 설명 |
+|----------|------|
+| `type` | `club` \| `study` \| `team` |
+| `field` | `개발` \| `디자인` \| `기획` \| `마케팅` \| `데이터` \| `기타` |
+| `q` | 검색어 (제목, 설명) |
+| `filter` | `deadline_soon` (3일 이내) \| `spots_soon` (2자리 이하) |
