@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const body = await request.json()
-  const { type, title, field, capacity, current, deadline, description, poster, roles } = body
+  const { type, title, field, capacity, current, deadline, description, poster, roles, applyMode, applyLink } = body
 
   // 필수값 검증
   if (!type || !(POST_TYPES as readonly string[]).includes(type)) {
@@ -82,6 +82,8 @@ export async function POST(request: NextRequest) {
       deadline: new Date(deadline),
       description: description.trim(),
       poster: type === 'club' && poster?.trim() ? poster.trim() : null,
+      applyMode: applyMode === 'link' ? 'link' : 'form',
+      applyLink: applyMode === 'link' && applyLink?.trim() ? applyLink.trim() : null,
       roles:
         type === 'team' && Array.isArray(roles) && roles.length > 0
           ? { create: roles.map((r: { name: string; count: number }) => ({ name: r.name, count: Number(r.count) })) }

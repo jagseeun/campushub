@@ -8,16 +8,18 @@ type Props = {
   roles: { id: number; name: string; count: number }[]
   isTeam: boolean
   isClosed: boolean
+  applyMode: string
+  applyLink: string | null
 }
 
-export default function ApplyForm({ postId, roles, isTeam, isClosed }: Props) {
+export default function ApplyForm({ postId, roles, isTeam, isClosed, applyMode, applyLink }: Props) {
   const [open, setOpen] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [form, setForm] = useState({ name: '', contact: '', roleWanted: '', message: '' })
 
   const inputCls =
-    'w-full border border-indigo-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-brand-400 bg-white'
+    'w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-brand-400 bg-white'
   const labelCls = 'block text-sm font-medium text-gray-700 mb-1.5'
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -44,60 +46,77 @@ export default function ApplyForm({ postId, roles, isTeam, isClosed }: Props) {
 
   if (isClosed) {
     return (
-      <div className="mt-6 p-4 bg-gray-100 rounded-xl text-center text-gray-500 text-sm font-medium">
+      <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl text-center text-gray-400 text-sm font-medium">
         이 모집은 마감되었습니다
       </div>
     )
   }
 
+  // 외부 링크 모드
+  if (applyMode === 'link') {
+    return (
+      <a
+        href={applyLink ?? '#'}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center justify-center gap-2 w-full py-3 bg-brand-600 text-white rounded-xl font-semibold text-sm hover:bg-brand-700 transition-colors"
+      >
+        <IconSend size={15} />
+        외부 폼으로 지원하기
+      </a>
+    )
+  }
+
   if (submitted) {
     return (
-      <div className="mt-6 p-6 bg-green-50 border border-green-200 rounded-xl text-center">
-        <IconCheckCircle size={36} className="text-green-500 mx-auto mb-2" />
-        <p className="font-bold text-green-800 mb-1">지원 완료!</p>
-        <p className="text-sm text-green-600">지원서가 성공적으로 제출되었습니다.</p>
+      <div className="p-6 bg-brand-50 border border-brand-100 rounded-xl text-center">
+        <IconCheckCircle size={36} className="text-brand-500 mx-auto mb-2" />
+        <p className="font-bold text-brand-800 mb-1">지원 완료!</p>
+        <p className="text-sm text-brand-600">지원서가 성공적으로 제출되었습니다.</p>
       </div>
     )
   }
 
   return (
-    <div className="mt-6">
+    <div>
       {!open ? (
         <button
           onClick={() => setOpen(true)}
           className="w-full py-3 bg-brand-600 text-white rounded-xl font-semibold text-sm hover:bg-brand-700 transition-colors flex items-center justify-center gap-2"
         >
-          <IconSend size={16} />
+          <IconSend size={15} />
           지원하기
         </button>
       ) : (
-        <div className="border border-brand-200 rounded-xl overflow-hidden">
-          <div className="bg-brand-600 px-5 py-3 flex items-center justify-between">
-            <span className="text-white font-semibold text-sm">지원서 작성</span>
-            <button onClick={() => setOpen(false)} className="text-brand-200 hover:text-white transition-colors">
-              <IconX size={16} />
+        <div className="border border-gray-200 rounded-xl overflow-hidden">
+          <div className="bg-gray-50 border-b border-gray-200 px-5 py-3 flex items-center justify-between">
+            <span className="text-gray-800 font-semibold text-sm">지원서 작성</span>
+            <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
+              <IconX size={15} />
             </button>
           </div>
           <form onSubmit={handleSubmit} className="p-5 space-y-4 bg-white">
-            <div>
-              <label className={labelCls}>이름 *</label>
-              <input
-                required
-                value={form.name}
-                onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-                placeholder="홍길동"
-                className={inputCls}
-              />
-            </div>
-            <div>
-              <label className={labelCls}>연락처 (이메일 또는 전화번호) *</label>
-              <input
-                required
-                value={form.contact}
-                onChange={(e) => setForm((p) => ({ ...p, contact: e.target.value }))}
-                placeholder="example@email.com"
-                className={inputCls}
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={labelCls}>이름 *</label>
+                <input
+                  required
+                  value={form.name}
+                  onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+                  placeholder="홍길동"
+                  className={inputCls}
+                />
+              </div>
+              <div>
+                <label className={labelCls}>연락처 *</label>
+                <input
+                  required
+                  value={form.contact}
+                  onChange={(e) => setForm((p) => ({ ...p, contact: e.target.value }))}
+                  placeholder="이메일 또는 전화번호"
+                  className={inputCls}
+                />
+              </div>
             </div>
             {isTeam && roles.length > 0 && (
               <div>

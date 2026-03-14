@@ -16,6 +16,8 @@ model Post {
   current      Int           @default(0)
   deadline     DateTime
   description  String
+  applyMode    String        @default("form")  // "form" | "link"
+  applyLink    String?
   roles        Role[]
   applications Application[]
   createdAt    DateTime      @default(now())

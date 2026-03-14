@@ -23,13 +23,13 @@
   --color-brand-800: #3730A3;
   --color-brand-900: #312E81;
 
-  /* Urgency — red */
-  --color-urgent-text: #DC2626;
-  --color-urgent-bg:   #FEF2F2;
-  --color-urgent-bar:  #EF4444;
+  /* Urgency — muted rose */
+  --color-urgent-text: #9F1239;
+  --color-urgent-bg:   #FFF1F2;
+  --color-urgent-bar:  #FB7185;
 
-  /* Warning — amber */
-  --color-warn-text: #D97706;
+  /* Warning — muted amber */
+  --color-warn-text: #92400E;
   --color-warn-bg:   #FFFBEB;
 }
 

@@ -14,6 +14,8 @@ export type Post = {
   current: number
   deadline: string
   description: string
+  applyMode: string
+  applyLink: string | null
   roles: Role[]
   createdAt: string
 }
