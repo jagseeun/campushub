@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/Header'
@@ -12,11 +12,10 @@ type Role = {
   count: number
 }
 
-let roleIdCounter = 0
-const newRole = (): Role => ({ id: String(++roleIdCounter), name: '', count: 1 })
-
 export default function NewPostPage() {
   const router = useRouter()
+  const roleIdCounter = useRef(0)
+  const newRole = (): Role => ({ id: String(++roleIdCounter.current), name: '', count: 1 })
   const [submitting, setSubmitting] = useState(false)
   const [type, setType] = useState<'club' | 'study' | 'team'>('study')
   const [roles, setRoles] = useState<Role[]>([newRole()])
@@ -198,38 +197,46 @@ export default function NewPostPage() {
             {type === 'team' && (
               <div>
                 <label className={labelCls}>모집 역할</label>
-                <div className="space-y-2">
+                <div className="bg-gray-50 rounded-xl p-4 space-y-2.5">
+                  <div className="grid gap-2 px-0.5" style={{ gridTemplateColumns: '1fr 88px 32px' }}>
+                    <span className="text-xs font-medium text-gray-400">역할명</span>
+                    <span className="text-xs font-medium text-gray-400 text-center">인원수</span>
+                    <span />
+                  </div>
                   {roles.map((role) => (
-                    <div key={role.id} className="flex gap-2">
+                    <div key={role.id} className="grid gap-2 items-center" style={{ gridTemplateColumns: '1fr 88px 32px' }}>
                       <input
                         value={role.name}
                         onChange={(e) => updateRole(role.id, 'name', e.target.value)}
-                        placeholder="역할명 (예: 프론트엔드)"
+                        placeholder="예: 프론트엔드"
                         required
-                        className={`${inputCls} flex-1`}
+                        className="w-full border border-gray-200 bg-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400"
                       />
-                      <input
-                        type="number"
-                        value={role.count}
-                        onChange={(e) => updateRole(role.id, 'count', Number(e.target.value))}
-                        min={1}
-                        className={`${inputCls} w-20`}
-                      />
-                      {roles.length > 1 && (
+                      <div className="relative">
+                        <input
+                          type="number"
+                          value={role.count}
+                          onChange={(e) => updateRole(role.id, 'count', Number(e.target.value))}
+                          min={1}
+                          className="w-full border border-gray-200 bg-white rounded-lg px-3 py-2 pr-7 text-sm text-center focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400"
+                        />
+                        <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-gray-400 pointer-events-none">명</span>
+                      </div>
+                      {roles.length > 1 ? (
                         <button
                           type="button"
                           onClick={() => removeRole(role.id)}
-                          className="px-2.5 text-red-400 hover:text-red-600 border border-gray-200 rounded-lg"
+                          className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-300 hover:text-red-400 hover:bg-red-50 transition-colors text-lg leading-none"
                         >
-                          ✕
+                          ×
                         </button>
-                      )}
+                      ) : <span />}
                     </div>
                   ))}
                   <button
                     type="button"
                     onClick={addRole}
-                    className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+                    className="text-sm text-indigo-500 hover:text-indigo-700 font-medium flex items-center gap-1 pt-1"
                   >
                     + 역할 추가
                   </button>

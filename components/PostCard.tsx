@@ -3,22 +3,16 @@
 import Link from 'next/link'
 import type { Post } from '@/types'
 
-const TYPE_ICONS: Record<string, string> = {
-  study: '📚',
-  club: '🏫',
-  team: '👥',
-}
-
 const TYPE_LABELS: Record<string, string> = {
   study: '스터디',
   club: '동아리',
   team: '팀원모집',
 }
 
-const TYPE_COLORS: Record<string, string> = {
-  study: 'bg-blue-100 text-blue-700',
-  club: 'bg-green-100 text-green-700',
-  team: 'bg-purple-100 text-purple-700',
+const TYPE_ICONS: Record<string, string> = {
+  study: '📚',
+  club: '🏫',
+  team: '👥',
 }
 
 export default function PostCard({ post }: { post: Post }) {
@@ -26,69 +20,80 @@ export default function PostCard({ post }: { post: Post }) {
   const deadline = new Date(post.deadline)
   const daysLeft = Math.ceil((deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
   const spotsLeft = post.capacity - post.current
+  const fillPct = Math.min(100, Math.round((post.current / post.capacity) * 100))
 
   const isDeadlineSoon = daysLeft <= 3 && daysLeft >= 0
   const isSpotsSoon = spotsLeft <= 2 && spotsLeft > 0
   const isFull = spotsLeft <= 0
 
   const formattedDeadline = deadline.toLocaleDateString('ko-KR', {
-    month: 'long',
+    month: 'short',
     day: 'numeric',
   })
 
   return (
     <Link href={`/posts/${post.id}`}>
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md hover:border-gray-200 transition-all duration-200 cursor-pointer h-full flex flex-col">
-        <div className="flex items-start justify-between mb-3">
-          <span className={`inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full ${TYPE_COLORS[post.type] ?? 'bg-gray-100 text-gray-700'}`}>
+      <div className="group bg-white rounded-2xl border border-gray-100 p-5 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-50 transition-all duration-200 h-full flex flex-col">
+
+        {/* Top row: type badge + status */}
+        <div className="flex items-center justify-between mb-4">
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-gray-100 text-gray-600">
             {TYPE_ICONS[post.type]} {TYPE_LABELS[post.type] ?? post.type}
           </span>
-          <div className="flex gap-1.5 flex-wrap justify-end">
+          <div className="flex items-center gap-1.5">
             {isFull ? (
-              <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-medium">
-                모집 마감
-              </span>
+              <span className="text-xs text-gray-400 bg-gray-100 px-2.5 py-1 rounded-full font-medium">마감</span>
             ) : (
               <>
                 {isDeadlineSoon && (
-                  <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-medium">
-                    🔥 마감임박
-                  </span>
+                  <span className="text-xs text-rose-500 bg-rose-50 px-2.5 py-1 rounded-full font-bold">D-{daysLeft}</span>
                 )}
                 {isSpotsSoon && (
-                  <span className="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-medium">
-                    ⚠ 자리 {spotsLeft}개 남음
-                  </span>
+                  <span className="text-xs text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full font-medium">{spotsLeft}자리</span>
                 )}
               </>
             )}
           </div>
         </div>
 
-        <h3 className="font-semibold text-gray-900 text-base mb-2 line-clamp-2 flex-1">
+        {/* Title */}
+        <h3 className="font-bold text-gray-900 text-[15px] leading-snug mb-2 line-clamp-2">
           {post.title}
         </h3>
 
-        <p className="text-sm text-gray-500 mb-4 line-clamp-2">{post.description}</p>
+        {/* Description */}
+        <p className="text-sm text-gray-400 line-clamp-2 leading-relaxed flex-1 mb-4">
+          {post.description}
+        </p>
 
-        <div className="mt-auto space-y-1.5 text-sm text-gray-600">
-          <div className="flex items-center gap-1.5">
-            <span className="text-gray-400">📌</span>
-            <span>{post.field}</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-gray-400">👤</span>
-            <span>
-              {post.current} / {post.capacity}명
+        {/* Footer */}
+        <div className="space-y-3">
+          {/* Field + capacity count */}
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-gray-500 bg-gray-50 px-2.5 py-1 rounded-lg">
+              {post.field}
+            </span>
+            <span className="text-xs text-gray-400">
+              <span className="text-gray-700 font-bold">{post.current}</span>
+              {' / '}{post.capacity}명 참여 중
             </span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-gray-400">📅</span>
-            <span className={isDeadlineSoon ? 'text-red-500 font-medium' : ''}>
-              {formattedDeadline} 마감
-              {daysLeft >= 0 && ` (D-${daysLeft})`}
-            </span>
+
+          {/* Progress bar */}
+          <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all ${
+                isFull ? 'bg-gray-300' : fillPct >= 80 ? 'bg-rose-400' : 'bg-indigo-500'
+              }`}
+              style={{ width: `${fillPct}%` }}
+            />
           </div>
+
+          {/* Deadline */}
+          <p className={`text-xs ${isDeadlineSoon && !isFull ? 'text-rose-500 font-semibold' : 'text-gray-400'}`}>
+            📅 {formattedDeadline} 마감
+            {!isFull && daysLeft >= 0 && !isDeadlineSoon && ` · D-${daysLeft}`}
+          </p>
         </div>
       </div>
     </Link>

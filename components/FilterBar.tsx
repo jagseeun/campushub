@@ -43,7 +43,7 @@ export default function FilterBar() {
     router.push(buildQuery({ [key]: current === value ? null : value }))
   }
 
-  const filterBtn = (key: FilterKey, value: string, label: string) => {
+  const chip = (key: FilterKey, value: string, label: string) => {
     const current =
       key === 'type' ? currentType : key === 'filter' ? currentFilter : currentField
     const active = current === value
@@ -51,10 +51,10 @@ export default function FilterBar() {
       <button
         key={value}
         onClick={() => toggle(key, value)}
-        className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-all ${
+        className={`px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all ${
           active
-            ? 'bg-indigo-600 text-white border-indigo-600'
-            : 'bg-white text-gray-600 border-gray-200 hover:border-indigo-300 hover:text-indigo-600'
+            ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm shadow-indigo-200'
+            : 'bg-white text-gray-500 border-gray-200 hover:border-indigo-300 hover:text-indigo-600'
         }`}
       >
         {label}
@@ -63,17 +63,19 @@ export default function FilterBar() {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2.5">
       <div className="flex flex-wrap gap-2">
-        {filterBtn('filter', 'deadline_soon', '🔥 마감임박')}
-        {filterBtn('filter', 'spots_soon', '⚠ 인원마감임박')}
-        {filterBtn('type', 'club', '🏫 동아리')}
-        {filterBtn('type', 'study', '📚 스터디')}
-        {filterBtn('type', 'team', '👥 팀원모집')}
+        {chip('filter', 'deadline_soon', '🔥 마감임박')}
+        {chip('filter', 'spots_soon', '⚡ 인원마감임박')}
+        <span className="w-px bg-gray-200 self-stretch mx-1" />
+        {chip('type', 'club', '🏫 동아리')}
+        {chip('type', 'study', '📚 스터디')}
+        {chip('type', 'team', '👥 팀원모집')}
       </div>
-      <div className="flex flex-wrap gap-2">
-        <span className="text-sm text-gray-400 self-center">분야:</span>
-        {FIELDS.map((f) => filterBtn('field', f, f))}
+      <div className="flex flex-wrap gap-2 items-center">
+        <span className="text-xs text-gray-300 font-medium">분야</span>
+        <span className="w-px h-3.5 bg-gray-200" />
+        {FIELDS.map((f) => chip('field', f, f))}
       </div>
     </div>
   )

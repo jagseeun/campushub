@@ -38,7 +38,6 @@ async function getPosts(searchParams: Record<string, string>) {
       ? posts.filter((p) => p.capacity - p.current <= 2 && p.current < p.capacity)
       : posts
 
-  // Date → string 직렬화 (클라이언트 컴포넌트로 전달 전)
   return filtered.map((p) => ({
     ...p,
     deadline: p.deadline.toISOString(),
@@ -53,27 +52,50 @@ export default async function HomePage({
 }) {
   const params = await searchParams
   const posts = await getPosts(params)
+  const isFiltered = !!(params.type || params.field || params.filter || params.q)
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#f8f8fc]">
       <Header
         right={
           <Link
             href="/posts/new"
-            className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors"
+            className="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-colors shadow-sm shadow-indigo-200"
           >
             + 모집글 작성
           </Link>
         }
       />
 
-      <main className="max-w-6xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">모집 공고</h1>
-          <p className="text-gray-500 text-sm">동아리, 스터디, 팀원을 찾아보세요</p>
+      <main className="max-w-6xl mx-auto px-4 pb-16">
+        {/* Hero */}
+        <div className="relative bg-gradient-to-br from-indigo-600 via-indigo-600 to-violet-600 rounded-3xl overflow-hidden mt-6 mb-6 px-8 py-10">
+          <div
+            className="absolute inset-0 opacity-20"
+            style={{
+              backgroundImage:
+                'radial-gradient(ellipse at 90% 10%, white 0%, transparent 55%), radial-gradient(ellipse at 10% 90%, white 0%, transparent 40%)',
+            }}
+          />
+          <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+            <div>
+              <p className="text-indigo-200 text-sm font-medium mb-1">CampusHub</p>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight mb-2">
+                캠퍼스의 모든 모집,<br className="hidden sm:block" /> 한 곳에서
+              </h1>
+              <p className="text-indigo-200 text-sm">동아리 · 스터디 · 팀원을 지금 찾아보세요</p>
+            </div>
+            <div className="text-left sm:text-right shrink-0">
+              <p className="text-5xl font-black text-white leading-none">{posts.length}</p>
+              <p className="text-indigo-200 text-sm mt-1">
+                {isFiltered ? '검색 결과' : '현재 모집 중'}
+              </p>
+            </div>
+          </div>
         </div>
 
-        <div className="mb-6 space-y-4">
+        {/* Search + Filter */}
+        <div className="mb-6 space-y-3">
           <Suspense>
             <SearchBar />
           </Suspense>
@@ -82,11 +104,17 @@ export default async function HomePage({
           </Suspense>
         </div>
 
+        {/* Grid */}
         {posts.length === 0 ? (
-          <div className="text-center py-20 text-gray-400">
-            <p className="text-4xl mb-3">😕</p>
-            <p className="text-lg font-medium">모집 공고가 없습니다</p>
-            <p className="text-sm mt-1">다른 필터를 시도해보세요</p>
+          <div className="text-center py-24">
+            <p className="text-5xl mb-4">🔍</p>
+            <p className="text-lg font-bold text-gray-700 mb-1">결과가 없어요</p>
+            <p className="text-sm text-gray-400">다른 키워드나 필터를 시도해보세요</p>
+            {isFiltered && (
+              <Link href="/" className="inline-block mt-6 text-sm text-indigo-600 hover:underline font-medium">
+                필터 초기화
+              </Link>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
