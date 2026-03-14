@@ -49,48 +49,76 @@ export default async function PostDetailPage({
   const accent    = TYPE_ACCENT[post.type] ?? TYPE_ACCENT.study
   const hasPoster = post.type === 'club' && !!post.poster
 
-  // 모집정보 + 지원 카드 (레이아웃에 따라 재사용)
-  const sideCards = (
-    <div className="space-y-4">
-      {/* 모집 정보 */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-6">
-        <p className="text-xs font-bold text-gray-400 tracking-widest uppercase mb-6">모집 정보</p>
-
-        <div className="mb-5">
-          <p className="text-sm text-gray-400 flex items-center gap-1.5 mb-1.5">
-            <IconCalendar size={13} /> 마감일
-          </p>
-          <div className="flex items-baseline gap-2">
-            <span
-              className="text-2xl font-extrabold"
-              style={!isClosed && daysLeft <= 3 ? { color: '#EF4444' } : { color: '#111827' }}
-            >
-              {deadline.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })}
+  // 배지 행 (공통)
+  const badges = (
+    <div className="flex items-center gap-2 flex-wrap">
+      <span
+        className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full border"
+        style={{ color: accent, background: `${accent}14`, borderColor: `${accent}35` }}
+      >
+        {TYPE_ICONS[post.type]} {TYPE_LABELS[post.type] ?? post.type}
+      </span>
+      <span className="text-xs text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200">
+        {post.field}
+      </span>
+      {isClosed ? (
+        <span className="text-xs bg-gray-100 text-gray-400 px-3 py-1.5 rounded-full font-semibold">
+          {isExpired ? '기간만료' : '모집마감'}
+        </span>
+      ) : (
+        <>
+          {daysLeft <= 3 && daysLeft >= 0 && (
+            <span className="inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-full font-bold bg-red-50 text-red-500 border border-red-200">
+              <IconFlame size={11} /> 마감임박
             </span>
-            {!isExpired && (
-              <span
-                className="text-sm font-bold px-2 py-0.5 rounded-full"
-                style={daysLeft <= 3
-                  ? { color: '#EF4444', background: '#FEF2F2' }
-                  : { color: accent, background: `${accent}14` }}
-              >
-                D-{daysLeft}
-              </span>
-            )}
-          </div>
-        </div>
+          )}
+          {spotsLeft <= 2 && spotsLeft > 0 && (
+            <span className="inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-full font-bold bg-amber-50 text-amber-600 border border-amber-200">
+              <IconAlertCircle size={11} /> 자리 {spotsLeft}개
+            </span>
+          )}
+        </>
+      )}
+    </div>
+  )
 
-        <div className="mb-5">
-          <p className="text-sm text-gray-400 flex items-center gap-1.5 mb-1.5">
-            <IconCount size={13} /> 참여 인원
+  // 정보 통계 블록 (공통)
+  const statsBlock = (
+    <>
+      {/* 마감일 행 */}
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-xs text-gray-400 mb-1 flex items-center gap-1">
+            <IconCalendar size={12} /> 마감일
           </p>
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-2xl font-extrabold text-gray-900">{post.current}</span>
-            <span className="text-base text-gray-400">/ {post.capacity}명</span>
-          </div>
+          <p
+            className="text-2xl font-extrabold"
+            style={!isClosed && daysLeft <= 3 ? { color: '#EF4444' } : { color: '#111827' }}
+          >
+            {deadline.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })}
+          </p>
         </div>
+        {!isExpired && (
+          <span
+            className="text-sm font-bold px-3 py-1.5 rounded-full"
+            style={daysLeft <= 3
+              ? { color: '#EF4444', background: '#FEF2F2' }
+              : { color: accent, background: `${accent}14` }}
+          >
+            D-{daysLeft}
+          </span>
+        )}
+      </div>
 
-        <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+      {/* 인원 + 진행바 */}
+      <div>
+        <div className="flex justify-between text-sm mb-2">
+          <span className="text-gray-400 flex items-center gap-1">
+            <IconCount size={13} /> 참여 인원
+          </span>
+          <span className="font-bold text-gray-900">{post.current} / {post.capacity}명</span>
+        </div>
+        <div className="h-2.5 rounded-full bg-gray-100 overflow-hidden">
           <div
             className="h-full rounded-full transition-all"
             style={{
@@ -99,44 +127,138 @@ export default async function PostDetailPage({
             }}
           />
         </div>
-        <div className="flex justify-between mt-2 text-xs text-gray-400">
+        <div className="flex justify-between mt-1.5 text-xs text-gray-400">
           <span>{fillPct}% 채워졌어요</span>
           <span className={!isClosed && spotsLeft <= 2 ? 'text-amber-500 font-bold' : ''}>
             {isClosed ? '마감됨' : `${spotsLeft}자리 남음`}
           </span>
         </div>
-
-        <p className="text-xs text-gray-300 mt-5 pt-4 border-t border-gray-100">
-          등록 {new Date(post.createdAt).toLocaleDateString('ko-KR')}
-        </p>
       </div>
 
-      {/* 지원 */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-6">
-        <ApplyForm
-          postId={post.id}
-          roles={post.roles}
-          isTeam={post.type === 'team'}
-          isClosed={isClosed}
-          applyMode={post.applyMode}
-          applyLink={post.applyLink}
-        />
-      </div>
-
-      {post.applyMode === 'form' && (
-        <Link
-          href={`/posts/${post.id}/applications`}
-          className="flex items-center justify-between w-full px-5 py-4 bg-white rounded-2xl border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all"
-        >
-          <span className="flex items-center gap-2 text-sm text-gray-500 font-medium">
-            <IconCount size={14} /> 지원 현황 확인
-          </span>
-          <span className="text-base font-bold text-gray-800">{post._count.applications}명 지원</span>
-        </Link>
+      {/* 모집 역할 */}
+      {post.roles.length > 0 && (
+        <div>
+          <p className="text-xs font-bold text-gray-400 tracking-widest uppercase mb-3">모집 역할</p>
+          <div className="flex flex-wrap gap-2">
+            {post.roles.map((role) => (
+              <div
+                key={role.id}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg border bg-gray-50 text-sm"
+                style={{ borderColor: `${accent}30` }}
+              >
+                <span className="font-semibold text-gray-800">{role.name}</span>
+                <span
+                  className="text-xs font-bold px-2 py-0.5 rounded-full"
+                  style={{ color: accent, background: `${accent}14` }}
+                >
+                  {role.count}명
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
-    </div>
+    </>
   )
 
+  if (hasPoster) {
+    // ── 매거진 레이아웃 (포스터 있음) ──
+    return (
+      <div className="min-h-screen bg-[#F5F6FA]">
+        <Header
+          right={
+            <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors">
+              <IconArrowLeft size={14} /> 목록으로
+            </Link>
+          }
+        />
+
+        <div className="flex" style={{ height: 'calc(100dvh - 64px)' }}>
+          {/* 포스터 영역 */}
+          <div
+            className="flex-1 flex items-center justify-center relative overflow-hidden"
+            style={{ background: `linear-gradient(135deg, ${accent}12 0%, #eef0f5 45%, ${accent}09 100%)` }}
+          >
+            {/* 도트 패턴 */}
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: 'radial-gradient(circle, #00000009 1px, transparent 1px)',
+                backgroundSize: '28px 28px',
+              }}
+            />
+            <div className="relative z-10 w-full max-w-[420px] aspect-[3/4]">
+              <Image
+                src={post.poster!}
+                alt="포스터"
+                fill
+                sizes="420px"
+                className="object-contain"
+                style={{ filter: 'drop-shadow(0 20px 48px rgba(0,0,0,0.22))' }}
+              />
+            </div>
+          </div>
+
+          {/* 사이드바 */}
+          <div className="w-[480px] bg-white border-l border-gray-200 flex flex-col flex-shrink-0">
+            {/* accent 그라데이션 스트립 */}
+            <div
+              className="h-1 flex-shrink-0"
+              style={{ background: `linear-gradient(90deg, ${accent}, ${accent}80)` }}
+            />
+
+            {/* 스크롤 영역 */}
+            <div className="flex-1 overflow-y-auto min-h-0">
+              {/* 타이틀 섹션 */}
+              <div className="px-8 pt-7 pb-6 border-b border-gray-100">
+                {badges}
+                <h1 className="text-[1.65rem] font-extrabold text-gray-900 leading-tight tracking-tight mt-4 mb-2.5">
+                  {post.title}
+                </h1>
+                <p className="text-gray-400 text-[13px] leading-relaxed whitespace-pre-wrap">
+                  {post.description}
+                </p>
+              </div>
+
+              {/* 통계 섹션 */}
+              <div className="px-8 py-6 space-y-5 border-b border-gray-100">
+                {statsBlock}
+              </div>
+
+              {/* 지원 섹션 — 스크롤 안에 위치, 펼쳐도 가림 없음 */}
+              <div className="px-8 py-6 space-y-2">
+                <ApplyForm
+                  postId={post.id}
+                  roles={post.roles}
+                  isTeam={post.type === 'team'}
+                  isClosed={isClosed}
+                  applyMode={post.applyMode}
+                  applyLink={post.applyLink}
+                />
+                {post.applyMode === 'form' && (
+                  <Link
+                    href={`/posts/${post.id}/applications`}
+                    className="flex items-center justify-between w-full px-4 py-2.5 rounded-xl hover:bg-gray-50 transition-colors"
+                  >
+                    <span className="flex items-center gap-2 text-sm text-gray-400 font-medium">
+                      <IconCount size={13} /> 지원 현황 확인
+                    </span>
+                    <span className="text-sm font-bold text-gray-600">{post._count.applications}명 지원</span>
+                  </Link>
+                )}
+              </div>
+
+              <p className="px-8 pb-6 text-xs text-gray-300">
+                등록 {new Date(post.createdAt).toLocaleDateString('ko-KR')}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ── 대시보드 레이아웃 (포스터 없음) ──
   return (
     <div className="min-h-screen bg-[#F5F6FA]">
       <Header
@@ -147,104 +269,67 @@ export default async function PostDetailPage({
         }
       />
 
-      {/* ── 헤더: 제목 + 설명 + 역할(팀) ── */}
-      <div className="bg-white border-b border-gray-200" style={{ borderTop: `5px solid ${accent}` }}>
-        <div className="max-w-5xl mx-auto px-6 py-10">
-
-          {/* 배지 */}
-          <div className="flex items-center gap-2 mb-5 flex-wrap">
-            <span
-              className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full border"
-              style={{ color: accent, background: `${accent}14`, borderColor: `${accent}35` }}
-            >
-              {TYPE_ICONS[post.type]} {TYPE_LABELS[post.type] ?? post.type}
-            </span>
-            <span className="text-xs text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200">
-              {post.field}
-            </span>
-            {isClosed ? (
-              <span className="text-xs bg-gray-100 text-gray-400 px-3 py-1.5 rounded-full font-semibold">
-                {isExpired ? '기간만료' : '모집마감'}
-              </span>
-            ) : (
-              <>
-                {daysLeft <= 3 && daysLeft >= 0 && (
-                  <span className="inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-full font-bold bg-red-50 text-red-500 border border-red-200">
-                    <IconFlame size={11} /> 마감임박
-                  </span>
-                )}
-                {spotsLeft <= 2 && spotsLeft > 0 && (
-                  <span className="inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-full font-bold bg-amber-50 text-amber-600 border border-amber-200">
-                    <IconAlertCircle size={11} /> 자리 {spotsLeft}개
-                  </span>
-                )}
-              </>
-            )}
-          </div>
-
-          {/* 제목 */}
-          <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight tracking-tight mb-3">
+      {/* 헤더 밴드 */}
+      <div className="bg-white border-b border-gray-200" style={{ borderTop: `4px solid ${accent}` }}>
+        <div className="max-w-5xl mx-auto px-6 py-5">
+          {badges}
+          <h1 className="text-2xl font-extrabold text-gray-900 leading-tight tracking-tight mt-4 mb-2">
             {post.title}
           </h1>
-
-          {/* 설명 */}
-          <p className="text-gray-500 text-[15px] leading-relaxed whitespace-pre-wrap max-w-2xl">
+          <p className="text-gray-500 text-sm leading-relaxed whitespace-pre-wrap max-w-2xl">
             {post.description}
           </p>
-
-          {/* 모집 역할 — 팀만, 헤더 안에 풀너비로 */}
-          {post.type === 'team' && post.roles.length > 0 && (
-            <div className="mt-8 pt-7 border-t border-gray-100">
-              <p className="text-xs font-bold text-gray-400 tracking-widest uppercase mb-4">모집 역할</p>
-              <div className="flex flex-wrap gap-3">
-                {post.roles.map((role) => (
-                  <div
-                    key={role.id}
-                    className="flex items-center gap-3 px-5 py-3 rounded-xl border bg-white shadow-sm"
-                    style={{ borderColor: `${accent}30` }}
-                  >
-                    <span className="font-semibold text-gray-800">{role.name}</span>
-                    <span
-                      className="text-xs font-bold px-2.5 py-1 rounded-full"
-                      style={{ color: accent, background: `${accent}14` }}
-                    >
-                      {role.count}명
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
-      {/* ── 본문 ── */}
-      <div className="max-w-5xl mx-auto px-6 py-8">
-        {hasPoster ? (
-          /* 동아리 + 포스터: 포스터 왼쪽 / 카드 오른쪽 sticky */
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start">
+      {/* 본문 2컬럼 */}
+      <div className="max-w-5xl mx-auto px-6 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6 items-start">
+
+          {/* 모집 정보 카드 */}
+          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden lg:sticky lg:top-6">
+            <div className="h-1 rounded-t-2xl" style={{ background: accent }} />
+            <div className="p-6">
+              <p className="text-xs font-bold text-gray-400 tracking-widest uppercase mb-5">모집 정보</p>
+              <div className="space-y-5">
+                {statsBlock}
+              </div>
+              <p className="text-xs text-gray-300 pt-5 mt-5 border-t border-gray-100">
+                등록 {new Date(post.createdAt).toLocaleDateString('ko-KR')}
+              </p>
+            </div>
+          </div>
+
+          {/* 지원 카드 */}
+          <div className="lg:sticky lg:top-6 space-y-3">
             <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-              <Image
-                src={post.poster!}
-                alt="포스터"
-                width={800}
-                height={1000}
-                className="w-full h-auto max-h-[560px] object-contain"
-                style={{ display: 'block' }}
-              />
+              <div className="h-1 rounded-t-2xl" style={{ background: accent }} />
+              <div className="p-6">
+                <ApplyForm
+                  postId={post.id}
+                  roles={post.roles}
+                  isTeam={post.type === 'team'}
+                  isClosed={isClosed}
+                  applyMode={post.applyMode}
+                  applyLink={post.applyLink}
+                />
+              </div>
             </div>
-            <div className="lg:sticky lg:top-6">
-              {sideCards}
-            </div>
+
+            {post.applyMode === 'form' && (
+              <Link
+                href={`/posts/${post.id}/applications`}
+                className="flex items-center justify-between w-full px-5 py-4 bg-white rounded-2xl border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all"
+              >
+                <span className="flex items-center gap-2 text-sm text-gray-500 font-medium">
+                  <IconCount size={14} /> 지원 현황 확인
+                </span>
+                <span className="text-base font-bold text-gray-800">{post._count.applications}명 지원</span>
+              </Link>
+            )}
           </div>
-        ) : (
-          /* 스터디 / 팀 / 포스터 없는 동아리: 카드 가운데 */
-          <div className="flex justify-center">
-            <div className="w-full max-w-xl">
-              {sideCards}
-            </div>
-          </div>
-        )}
+
+        </div>
       </div>
     </div>
   )
