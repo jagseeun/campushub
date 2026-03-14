@@ -93,9 +93,14 @@ export default async function PostDetailPage({
           </div>
 
           {/* 제목 */}
-          <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight tracking-tight">
+          <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight tracking-tight mb-3">
             {post.title}
           </h1>
+
+          {/* 설명 */}
+          <p className="text-gray-500 text-[15px] leading-relaxed whitespace-pre-wrap max-w-2xl">
+            {post.description}
+          </p>
         </div>
       </div>
 
@@ -105,11 +110,6 @@ export default async function PostDetailPage({
 
           {/* ── 왼쪽 콘텐츠 ── */}
           <div className="space-y-6">
-
-            {/* 설명 */}
-            <p className="text-gray-700 text-[16px] leading-[1.9] whitespace-pre-wrap px-1">
-              {post.description}
-            </p>
 
             {/* 포스터 (동아리) */}
             {post.type === 'club' && post.poster && (
