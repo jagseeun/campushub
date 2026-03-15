@@ -8,6 +8,7 @@ import {
   IconFlame, IconAlertCircle, IconCalendar, IconUsers as IconCount,
 } from '@/components/Icons'
 import { prisma } from '@/lib/prisma'
+import { auth } from '@/auth'
 
 const TYPE_ICONS: Record<string, React.ReactNode> = {
   study: <IconBook size={15} />,
@@ -32,11 +33,16 @@ export default async function PostDetailPage({
   const numId = parseInt(id)
   if (isNaN(numId) || numId < 1) notFound()
 
-  const post = await prisma.post.findUnique({
-    where: { id: numId },
-    include: { roles: true, _count: { select: { applications: true } } },
-  })
+  const [post, session] = await Promise.all([
+    prisma.post.findUnique({
+      where: { id: numId },
+      include: { roles: true, _count: { select: { applications: true } } },
+    }),
+    auth(),
+  ])
   if (!post) notFound()
+
+  const isCreator = !!(session?.user?.id && post.creatorId === session.user.id)
 
   const now       = new Date()
   const deadline  = new Date(post.deadline)
@@ -111,29 +117,31 @@ export default async function PostDetailPage({
       </div>
 
       {/* 인원 + 진행바 */}
-      <div>
-        <div className="flex justify-between text-sm mb-2">
-          <span className="text-gray-400 flex items-center gap-1">
-            <IconCount size={13} /> 참여 인원
-          </span>
-          <span className="font-bold text-gray-900">{post.current} / {post.capacity}명</span>
+      {post.showApplicantCount && (
+        <div>
+          <div className="flex justify-between text-sm mb-2">
+            <span className="text-gray-400 flex items-center gap-1">
+              <IconCount size={13} /> 참여 인원
+            </span>
+            <span className="font-bold text-gray-900">{post.current} / {post.capacity}명</span>
+          </div>
+          <div className="h-2.5 rounded-full bg-gray-100 overflow-hidden">
+            <div
+              className="h-full rounded-full transition-all"
+              style={{
+                width: `${fillPct}%`,
+                background: isClosed ? '#D1D5DB' : fillPct >= 80 ? '#EF4444' : accent,
+              }}
+            />
+          </div>
+          <div className="flex justify-between mt-1.5 text-xs text-gray-400">
+            <span>{fillPct}% 채워졌어요</span>
+            <span className={!isClosed && spotsLeft <= 2 ? 'text-amber-500 font-bold' : ''}>
+              {isClosed ? '마감됨' : `${spotsLeft}자리 남음`}
+            </span>
+          </div>
         </div>
-        <div className="h-2.5 rounded-full bg-gray-100 overflow-hidden">
-          <div
-            className="h-full rounded-full transition-all"
-            style={{
-              width: `${fillPct}%`,
-              background: isClosed ? '#D1D5DB' : fillPct >= 80 ? '#EF4444' : accent,
-            }}
-          />
-        </div>
-        <div className="flex justify-between mt-1.5 text-xs text-gray-400">
-          <span>{fillPct}% 채워졌어요</span>
-          <span className={!isClosed && spotsLeft <= 2 ? 'text-amber-500 font-bold' : ''}>
-            {isClosed ? '마감됨' : `${spotsLeft}자리 남음`}
-          </span>
-        </div>
-      </div>
+      )}
 
       {/* 모집 역할 */}
       {post.roles.length > 0 && (
@@ -191,15 +199,15 @@ export default async function PostDetailPage({
             applyMode={post.applyMode}
             applyLink={post.applyLink}
           />
-          {post.applyMode === 'form' && (
+          {post.applyMode === 'form' && isCreator && (
             <Link
-              href={`/posts/${post.id}/applications`}
-              className="flex items-center justify-between w-full px-4 py-2.5 rounded-xl hover:bg-gray-50 transition-colors"
+              href={`/posts/${post.id}/manage`}
+              className="flex items-center justify-between w-full px-4 py-2.5 rounded-xl bg-brand-50 hover:bg-brand-100 transition-colors border border-brand-100"
             >
-              <span className="flex items-center gap-2 text-sm text-gray-400 font-medium">
-                <IconCount size={13} /> 지원 현황 확인
+              <span className="flex items-center gap-2 text-sm text-brand-700 font-semibold">
+                <IconCount size={13} /> 지원자 관리
               </span>
-              <span className="text-sm font-bold text-gray-600">{post._count.applications}명 지원</span>
+              <span className="text-sm font-bold text-brand-600">{post._count.applications}명 지원</span>
             </Link>
           )}
         </div>
@@ -333,15 +341,15 @@ export default async function PostDetailPage({
               </div>
             </div>
 
-            {post.applyMode === 'form' && (
+            {post.applyMode === 'form' && isCreator && (
               <Link
-                href={`/posts/${post.id}/applications`}
-                className="flex items-center justify-between w-full px-5 py-4 bg-white rounded-2xl border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all"
+                href={`/posts/${post.id}/manage`}
+                className="flex items-center justify-between w-full px-5 py-4 bg-brand-50 rounded-2xl border border-brand-100 hover:border-brand-200 hover:shadow-sm transition-all"
               >
-                <span className="flex items-center gap-2 text-sm text-gray-500 font-medium">
-                  <IconCount size={14} /> 지원 현황 확인
+                <span className="flex items-center gap-2 text-sm text-brand-700 font-semibold">
+                  <IconCount size={14} /> 지원자 관리
                 </span>
-                <span className="text-base font-bold text-gray-800">{post._count.applications}명 지원</span>
+                <span className="text-base font-bold text-brand-600">{post._count.applications}명 지원</span>
               </Link>
             )}
           </div>

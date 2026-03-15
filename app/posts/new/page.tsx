@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { useSession, signIn } from 'next-auth/react'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import {
@@ -14,6 +15,7 @@ type Role = { id: string; name: string; count: number }
 
 export default function NewPostPage() {
   const router = useRouter()
+  const { status } = useSession()
   const roleIdCounter = useRef(0)
   const newRole = (): Role => ({ id: String(++roleIdCounter.current), name: '', count: 1 })
 
@@ -23,10 +25,17 @@ export default function NewPostPage() {
   const [applyMode, setApplyMode] = useState<'form' | 'link'>('form')
   const [posterPreview, setPosterPreview] = useState<string | null>(null)
   const [roles, setRoles] = useState<Role[]>([newRole()])
+  const [showApplicantCount, setShowApplicantCount] = useState(true)
   const [form, setForm] = useState({
     title: '', field: '개발', capacity: 5, current: 0,
     deadline: '', description: '', poster: '', applyLink: '',
   })
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      signIn()
+    }
+  }, [status])
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -75,6 +84,7 @@ export default function NewPostPage() {
           poster: type === 'club' ? form.poster : null,
           applyMode,
           applyLink: applyMode === 'link' ? form.applyLink : null,
+          showApplicantCount,
         }),
       })
       if (!res.ok) { alert((await res.json()).error ?? '제출 실패'); return }
@@ -91,6 +101,14 @@ export default function NewPostPage() {
     { value: 'club', label: '동아리', icon: <IconBuilding size={15} /> },
     { value: 'team', label: '팀원모집', icon: <IconUsers size={15} /> },
   ] as const
+
+  if (status === 'loading' || status === 'unauthenticated') {
+    return (
+      <div className="min-h-screen bg-[#F8F9FF] flex items-center justify-center">
+        <p className="text-gray-400 text-sm">로그인 확인 중...</p>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-[#F8F9FF]">
@@ -158,6 +176,27 @@ export default function NewPostPage() {
                 <input type="number" name="current" value={form.current} onChange={handleChange}
                   min={0} max={form.capacity} required className={inputCls} />
               </div>
+            </div>
+
+            {/* 지원자 수 공개 여부 */}
+            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+              <div>
+                <p className="text-sm font-medium text-gray-700">지원자 수 공개</p>
+                <p className="text-xs text-gray-400 mt-0.5">지원자 수를 모집 글에 표시합니다</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowApplicantCount((v) => !v)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  showApplicantCount ? 'bg-brand-600' : 'bg-gray-200'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                    showApplicantCount ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
             </div>
 
             {/* 포스터 (동아리) */}

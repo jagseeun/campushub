@@ -16,7 +16,22 @@ export type Post = {
   description: string
   applyMode: string
   applyLink: string | null
+  creatorId: string | null
+  showApplicantCount: boolean
   roles: Role[]
+  createdAt: string
+}
+
+export type Application = {
+  id: number
+  postId: number
+  name: string
+  contact: string
+  roleWanted: string | null
+  message: string
+  status: string           // "pending" | "accepted" | "rejected"
+  reviewNote: string | null
+  statusToken: string
   createdAt: string
 }
 

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { ReactNode } from 'react'
 import { IconGradCap } from './Icons'
+import AuthButton from './AuthButton'
 
 export default function Header({ right }: { right?: ReactNode }) {
   return (
@@ -10,7 +11,13 @@ export default function Header({ right }: { right?: ReactNode }) {
           <IconGradCap size={22} />
           CampusHub
         </Link>
-        {right}
+        <div className="flex items-center gap-3">
+          {right}
+          <Link href="/applications/check" className="text-sm text-gray-500 hover:text-brand-600 transition-colors hidden sm:block">
+            내 지원 결과
+          </Link>
+          <AuthButton />
+        </div>
       </div>
     </header>
   )

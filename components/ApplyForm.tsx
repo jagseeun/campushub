@@ -1,7 +1,25 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { IconSend, IconCheckCircle, IconX } from './Icons'
+
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false)
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(window.location.origin + text)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+  return (
+    <button
+      onClick={handleCopy}
+      className="shrink-0 text-xs font-medium px-2.5 py-1 rounded-md border border-brand-300 text-brand-600 hover:bg-brand-50 transition-colors"
+    >
+      {copied ? '복사됨!' : '복사'}
+    </button>
+  )
+}
 
 type Props = {
   postId: number
@@ -17,6 +35,7 @@ export default function ApplyForm({ postId, roles, isTeam, isClosed, applyMode, 
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [form, setForm] = useState({ name: '', contact: '', roleWanted: '', message: '' })
+  const [resultLink, setResultLink] = useState<string | null>(null)
 
   const inputCls =
     'w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-brand-400 bg-white'
@@ -35,6 +54,10 @@ export default function ApplyForm({ postId, roles, isTeam, isClosed, applyMode, 
         const err = await res.json()
         alert(err.error ?? '지원에 실패했습니다.')
         return
+      }
+      const data = await res.json()
+      if (data.id && data.statusToken) {
+        setResultLink(`/applications/${data.id}/status?token=${data.statusToken}`)
       }
       setSubmitted(true)
     } catch {
@@ -72,7 +95,29 @@ export default function ApplyForm({ postId, roles, isTeam, isClosed, applyMode, 
       <div className="p-6 bg-brand-50 border border-brand-100 rounded-xl text-center">
         <IconCheckCircle size={36} className="text-brand-500 mx-auto mb-2" />
         <p className="font-bold text-brand-800 mb-1">지원 완료!</p>
-        <p className="text-sm text-brand-600">지원서가 성공적으로 제출되었습니다.</p>
+        <p className="text-sm text-brand-600 mb-4">지원서가 성공적으로 제출되었습니다.</p>
+        {resultLink && (
+          <div className="bg-white border border-brand-200 rounded-lg p-3 space-y-3">
+            <div>
+              <p className="text-xs text-gray-500 mb-2">결과 확인 링크</p>
+              <div className="flex items-center gap-2">
+                <Link
+                  href={resultLink}
+                  className="flex-1 text-sm font-semibold text-brand-600 hover:text-brand-700 underline underline-offset-2 truncate text-left"
+                >
+                  결과 확인하기 →
+                </Link>
+                <CopyButton text={resultLink} />
+              </div>
+            </div>
+            <p className="text-xs text-gray-400">
+              링크를 잃어버려도 이름 + 연락처로 다시 찾을 수 있어요.{' '}
+              <Link href="/applications/check" className="text-brand-500 hover:underline font-medium">
+                내 지원 결과 확인하기
+              </Link>
+            </p>
+          </div>
+        )}
       </div>
     )
   }

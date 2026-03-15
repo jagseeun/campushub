@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { randomBytes } from 'crypto'
 
 export async function POST(
   request: NextRequest,
@@ -29,6 +30,16 @@ export async function POST(
   if (!contact?.trim()) return NextResponse.json({ error: '연락처를 입력해주세요.' }, { status: 400 })
   if (!message?.trim()) return NextResponse.json({ error: '지원 메시지를 입력해주세요.' }, { status: 400 })
 
+  // 중복 지원 체크
+  const existing = await prisma.application.findFirst({
+    where: { postId, contact: contact.trim() },
+  })
+  if (existing) {
+    return NextResponse.json({ error: '이미 이 모집에 지원하셨습니다.' }, { status: 409 })
+  }
+
+  const statusToken = randomBytes(32).toString('hex')
+
   const application = await prisma.application.create({
     data: {
       postId,
@@ -36,8 +47,9 @@ export async function POST(
       contact: contact.trim(),
       roleWanted: roleWanted?.trim() || null,
       message: message.trim(),
+      statusToken,
     },
   })
 
-  return NextResponse.json(application, { status: 201 })
+  return NextResponse.json({ ...application, statusToken }, { status: 201 })
 }

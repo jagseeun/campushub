@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { POST_TYPES, FIELDS } from '@/types'
 import { Prisma } from '@prisma/client'
+import { auth } from '@/auth'
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
@@ -46,8 +47,12 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const session = await auth()
   const body = await request.json()
-  const { type, title, field, capacity, current, deadline, description, poster, roles, applyMode, applyLink } = body
+  const {
+    type, title, field, capacity, current, deadline, description, poster,
+    roles, applyMode, applyLink, showApplicantCount,
+  } = body
 
   // 필수값 검증
   if (!type || !(POST_TYPES as readonly string[]).includes(type)) {
@@ -84,6 +89,8 @@ export async function POST(request: NextRequest) {
       poster: type === 'club' && poster?.trim() ? poster.trim() : null,
       applyMode: applyMode === 'link' ? 'link' : 'form',
       applyLink: applyMode === 'link' && applyLink?.trim() ? applyLink.trim() : null,
+      creatorId: session?.user?.id ?? null,
+      showApplicantCount: showApplicantCount !== false,
       roles:
         type === 'team' && Array.isArray(roles) && roles.length > 0
           ? { create: roles.map((r: { name: string; count: number }) => ({ name: r.name, count: Number(r.count) })) }
