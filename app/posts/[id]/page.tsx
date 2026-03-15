@@ -164,7 +164,7 @@ export default async function PostDetailPage({
   if (hasPoster) {
     // ── 매거진 레이아웃 (포스터 있음) ──
     return (
-      <div className="min-h-screen bg-[#F5F6FA]">
+      <div className="min-h-screen bg-[#F5F6FA] md:h-screen md:flex md:flex-col">
         <Header
           right={
             <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors">
@@ -173,14 +173,13 @@ export default async function PostDetailPage({
           }
         />
 
-        {/* 모바일: 세로 스택 / 데스크톱: 좌우 분할 */}
-        <div className="flex flex-col md:flex-row md:h-[calc(100dvh-64px)]">
+        {/* 모바일: 세로 스택 (페이지 스크롤) / 데스크톱: 좌우 분할 (사이드바 내부 스크롤) */}
+        <div className="flex flex-col md:flex-row md:flex-1 md:overflow-hidden">
           {/* 포스터 영역 */}
           <div
-            className="flex items-center justify-center relative overflow-hidden h-64 md:h-auto md:flex-1"
+            className="flex items-center justify-center relative overflow-hidden py-10 md:py-0 md:flex-1"
             style={{ background: `linear-gradient(135deg, ${accent}12 0%, #eef0f5 45%, ${accent}09 100%)` }}
           >
-            {/* 도트 패턴 */}
             <div
               className="absolute inset-0"
               style={{
@@ -188,29 +187,26 @@ export default async function PostDetailPage({
                 backgroundSize: '28px 28px',
               }}
             />
-            <div className="relative z-10 w-full max-w-[280px] md:max-w-[420px] aspect-[3/4]">
+            <div className="relative z-10 w-full max-w-[260px] sm:max-w-[320px] md:max-w-[420px] aspect-[3/4]">
               <Image
                 src={post.poster!}
                 alt="포스터"
                 fill
-                sizes="(max-width: 768px) 280px, 420px"
+                sizes="(max-width: 640px) 260px, (max-width: 768px) 320px, 420px"
                 className="object-contain"
                 style={{ filter: 'drop-shadow(0 20px 48px rgba(0,0,0,0.22))' }}
               />
             </div>
           </div>
 
-          {/* 사이드바 */}
-          <div className="w-full md:w-[480px] bg-white md:border-l border-t md:border-t-0 border-gray-200 flex flex-col md:flex-shrink-0">
-            {/* accent 그라데이션 스트립 */}
+          {/* 사이드바 — 모바일: 자연 높이 / 데스크톱: 내부 스크롤 */}
+          <div className="w-full md:w-[480px] bg-white border-t md:border-t-0 md:border-l border-gray-200 md:flex md:flex-col md:flex-shrink-0">
             <div
-              className="h-1 flex-shrink-0"
+              className="h-1 shrink-0"
               style={{ background: `linear-gradient(90deg, ${accent}, ${accent}80)` }}
             />
 
-            {/* 스크롤 영역 */}
-            <div className="flex-1 overflow-y-auto min-h-0">
-              {/* 타이틀 섹션 */}
+            <div className="md:flex-1 md:overflow-y-auto md:min-h-0">
               <div className="px-5 md:px-8 pt-6 md:pt-7 pb-6 border-b border-gray-100">
                 {badges}
                 <h1 className="text-2xl md:text-[1.65rem] font-extrabold text-gray-900 leading-tight tracking-tight mt-4 mb-2.5">
@@ -221,12 +217,10 @@ export default async function PostDetailPage({
                 </p>
               </div>
 
-              {/* 통계 섹션 */}
               <div className="px-5 md:px-8 py-6 space-y-5 border-b border-gray-100">
                 {statsBlock}
               </div>
 
-              {/* 지원 섹션 */}
               <div className="px-5 md:px-8 py-6 space-y-2">
                 <ApplyForm
                   postId={post.id}
@@ -249,7 +243,7 @@ export default async function PostDetailPage({
                 )}
               </div>
 
-              <p className="px-5 md:px-8 pb-6 text-xs text-gray-300">
+              <p className="px-5 md:px-8 pb-8 text-xs text-gray-300">
                 등록 {new Date(post.createdAt).toLocaleDateString('ko-KR')}
               </p>
             </div>
