@@ -162,94 +162,116 @@ export default async function PostDetailPage({
   )
 
   if (hasPoster) {
-    // ── 매거진 레이아웃 (포스터 있음) ──
-    return (
-      <div className="min-h-screen bg-[#F5F6FA] md:h-screen md:flex md:flex-col">
-        <Header
-          right={
-            <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors">
-              <IconArrowLeft size={14} /> 목록으로
-            </Link>
-          }
-        />
+    const backLink = (
+      <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors">
+        <IconArrowLeft size={14} /> 목록으로
+      </Link>
+    )
 
-        {/* 모바일: 세로 스택 (페이지 스크롤) / 데스크톱: 좌우 분할 (사이드바 내부 스크롤) */}
-        <div className="flex flex-col md:flex-row md:flex-1 md:overflow-hidden">
-          {/* 포스터 영역 */}
+    const sidebarContent = (
+      <>
+        <div className="px-5 md:px-8 pt-6 pb-6 border-b border-gray-100">
+          {badges}
+          <h1 className="text-2xl font-extrabold text-gray-900 leading-tight tracking-tight mt-4 mb-2.5">
+            {post.title}
+          </h1>
+          <p className="text-gray-400 text-[13px] leading-relaxed whitespace-pre-wrap">
+            {post.description}
+          </p>
+        </div>
+        <div className="px-5 md:px-8 py-6 space-y-5 border-b border-gray-100">
+          {statsBlock}
+        </div>
+        <div className="px-5 md:px-8 py-6 space-y-2">
+          <ApplyForm
+            postId={post.id}
+            roles={post.roles}
+            isTeam={post.type === 'team'}
+            isClosed={isClosed}
+            applyMode={post.applyMode}
+            applyLink={post.applyLink}
+          />
+          {post.applyMode === 'form' && (
+            <Link
+              href={`/posts/${post.id}/applications`}
+              className="flex items-center justify-between w-full px-4 py-2.5 rounded-xl hover:bg-gray-50 transition-colors"
+            >
+              <span className="flex items-center gap-2 text-sm text-gray-400 font-medium">
+                <IconCount size={13} /> 지원 현황 확인
+              </span>
+              <span className="text-sm font-bold text-gray-600">{post._count.applications}명 지원</span>
+            </Link>
+          )}
+        </div>
+        <p className="px-5 md:px-8 pb-8 text-xs text-gray-300">
+          등록 {new Date(post.createdAt).toLocaleDateString('ko-KR')}
+        </p>
+      </>
+    )
+
+    // ── 모바일 레이아웃 ──
+    return (
+      <>
+        {/* 모바일 (md 미만) */}
+        <div className="md:hidden min-h-screen bg-[#F5F6FA]">
+          <Header right={backLink} />
+          {/* 포스터 */}
           <div
-            className="relative flex items-center justify-center overflow-hidden py-10 md:py-0 md:flex-1"
+            className="flex items-center justify-center px-8 py-10"
             style={{ background: `linear-gradient(135deg, ${accent}12 0%, #eef0f5 45%, ${accent}09 100%)` }}
           >
-            <div
-              className="absolute inset-0"
-              style={{
-                backgroundImage: 'radial-gradient(circle, #00000009 1px, transparent 1px)',
-                backgroundSize: '28px 28px',
-              }}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={post.poster!}
+              alt="포스터"
+              className="max-h-72 w-auto object-contain rounded-xl"
+              style={{ filter: 'drop-shadow(0 12px 32px rgba(0,0,0,0.18))' }}
             />
-            <div className="relative z-10 w-full max-w-[260px] sm:max-w-[320px] md:max-w-[420px]">
-              <Image
-                src={post.poster!}
-                alt="포스터"
-                width={420}
-                height={560}
-                className="w-full h-auto object-contain"
-                style={{ filter: 'drop-shadow(0 20px 48px rgba(0,0,0,0.22))' }}
-              />
-            </div>
           </div>
+          {/* 내용 */}
+          <div className="bg-white">
+            <div className="h-1" style={{ background: `linear-gradient(90deg, ${accent}, ${accent}80)` }} />
+            {sidebarContent}
+          </div>
+        </div>
 
-          {/* 사이드바 — 모바일: 자연 높이 / 데스크톱: 내부 스크롤 */}
-          <div className="w-full md:w-[480px] bg-white border-t md:border-t-0 md:border-l border-gray-200 md:flex md:flex-col md:flex-shrink-0">
+        {/* 데스크톱 (md 이상) */}
+        <div className="hidden md:flex md:flex-col md:h-screen bg-[#F5F6FA]">
+          <Header right={backLink} />
+          <div className="flex flex-1 overflow-hidden">
+            {/* 포스터 영역 */}
             <div
-              className="h-1 shrink-0"
-              style={{ background: `linear-gradient(90deg, ${accent}, ${accent}80)` }}
-            />
-
-            <div className="md:flex-1 md:overflow-y-auto md:min-h-0">
-              <div className="px-5 md:px-8 pt-6 md:pt-7 pb-6 border-b border-gray-100">
-                {badges}
-                <h1 className="text-2xl md:text-[1.65rem] font-extrabold text-gray-900 leading-tight tracking-tight mt-4 mb-2.5">
-                  {post.title}
-                </h1>
-                <p className="text-gray-400 text-[13px] leading-relaxed whitespace-pre-wrap">
-                  {post.description}
-                </p>
-              </div>
-
-              <div className="px-5 md:px-8 py-6 space-y-5 border-b border-gray-100">
-                {statsBlock}
-              </div>
-
-              <div className="px-5 md:px-8 py-6 space-y-2">
-                <ApplyForm
-                  postId={post.id}
-                  roles={post.roles}
-                  isTeam={post.type === 'team'}
-                  isClosed={isClosed}
-                  applyMode={post.applyMode}
-                  applyLink={post.applyLink}
+              className="flex-1 flex items-center justify-center relative overflow-hidden"
+              style={{ background: `linear-gradient(135deg, ${accent}12 0%, #eef0f5 45%, ${accent}09 100%)` }}
+            >
+              <div
+                className="absolute inset-0"
+                style={{
+                  backgroundImage: 'radial-gradient(circle, #00000009 1px, transparent 1px)',
+                  backgroundSize: '28px 28px',
+                }}
+              />
+              <div className="relative z-10 w-full max-w-[420px] aspect-[3/4]">
+                <Image
+                  src={post.poster!}
+                  alt="포스터"
+                  fill
+                  sizes="420px"
+                  className="object-contain"
+                  style={{ filter: 'drop-shadow(0 20px 48px rgba(0,0,0,0.22))' }}
                 />
-                {post.applyMode === 'form' && (
-                  <Link
-                    href={`/posts/${post.id}/applications`}
-                    className="flex items-center justify-between w-full px-4 py-2.5 rounded-xl hover:bg-gray-50 transition-colors"
-                  >
-                    <span className="flex items-center gap-2 text-sm text-gray-400 font-medium">
-                      <IconCount size={13} /> 지원 현황 확인
-                    </span>
-                    <span className="text-sm font-bold text-gray-600">{post._count.applications}명 지원</span>
-                  </Link>
-                )}
               </div>
-
-              <p className="px-5 md:px-8 pb-8 text-xs text-gray-300">
-                등록 {new Date(post.createdAt).toLocaleDateString('ko-KR')}
-              </p>
+            </div>
+            {/* 사이드바 */}
+            <div className="w-[480px] bg-white border-l border-gray-200 flex flex-col flex-shrink-0">
+              <div className="h-1 shrink-0" style={{ background: `linear-gradient(90deg, ${accent}, ${accent}80)` }} />
+              <div className="flex-1 overflow-y-auto min-h-0">
+                {sidebarContent}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </>
     )
   }
 
