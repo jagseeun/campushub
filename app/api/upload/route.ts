@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile, mkdir } from 'fs/promises'
-import { join } from 'path'
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export async function POST(request: NextRequest) {
   const formData = await request.formData()
@@ -24,10 +28,16 @@ export async function POST(request: NextRequest) {
 
   const ext = file.name.split('.').pop()?.toLowerCase() ?? 'jpg'
   const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-  const uploadDir = join(process.cwd(), 'public', 'uploads')
 
-  await mkdir(uploadDir, { recursive: true })
-  await writeFile(join(uploadDir, filename), buffer)
+  const { error } = await supabase.storage
+    .from('posters')
+    .upload(filename, buffer, { contentType: file.type })
 
-  return NextResponse.json({ url: `/uploads/${filename}` })
+  if (error) {
+    return NextResponse.json({ error: '업로드 실패: ' + error.message }, { status: 500 })
+  }
+
+  const { data } = supabase.storage.from('posters').getPublicUrl(filename)
+
+  return NextResponse.json({ url: data.publicUrl })
 }
