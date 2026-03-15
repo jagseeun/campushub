@@ -132,7 +132,7 @@ export default function NewPostPage() {
             </div>
 
             {/* 분야 + 마감일 */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className={labelCls}>분야</label>
                 <select name="field" value={form.field} onChange={handleChange} className={inputCls}>
@@ -147,7 +147,7 @@ export default function NewPostPage() {
             </div>
 
             {/* 모집 인원 + 현재 인원 */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className={labelCls}>모집 인원</label>
                 <input type="number" name="capacity" value={form.capacity} onChange={handleChange}

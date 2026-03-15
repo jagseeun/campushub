@@ -61,17 +61,17 @@ export default async function HomePage({
         right={
           <Link
             href="/posts/new"
-            className="inline-flex items-center gap-1.5 bg-brand-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-brand-700 transition-colors shadow-sm shadow-brand-200"
+            className="inline-flex items-center gap-1.5 bg-brand-600 text-white px-3 py-2 sm:px-4 rounded-xl text-sm font-semibold hover:bg-brand-700 transition-colors shadow-sm shadow-brand-200"
           >
             <IconPlus size={14} />
-            모집글 작성
+            <span className="hidden sm:inline">모집글 작성</span>
           </Link>
         }
       />
 
       <main className="max-w-6xl mx-auto px-4 pb-16">
         {/* Hero */}
-        <div className="relative bg-gradient-to-br from-brand-900 via-brand-700 to-brand-500 rounded-3xl overflow-hidden mt-6 mb-6 px-8 py-10">
+        <div className="relative bg-gradient-to-br from-brand-900 via-brand-700 to-brand-500 rounded-3xl overflow-hidden mt-6 mb-6 px-5 py-8 sm:px-8 sm:py-10">
           <div
             className="absolute inset-0 opacity-20"
             style={{

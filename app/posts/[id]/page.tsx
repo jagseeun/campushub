@@ -173,10 +173,11 @@ export default async function PostDetailPage({
           }
         />
 
-        <div className="flex" style={{ height: 'calc(100dvh - 64px)' }}>
+        {/* 모바일: 세로 스택 / 데스크톱: 좌우 분할 */}
+        <div className="flex flex-col md:flex-row md:h-[calc(100dvh-64px)]">
           {/* 포스터 영역 */}
           <div
-            className="flex-1 flex items-center justify-center relative overflow-hidden"
+            className="flex items-center justify-center relative overflow-hidden h-64 md:h-auto md:flex-1"
             style={{ background: `linear-gradient(135deg, ${accent}12 0%, #eef0f5 45%, ${accent}09 100%)` }}
           >
             {/* 도트 패턴 */}
@@ -187,12 +188,12 @@ export default async function PostDetailPage({
                 backgroundSize: '28px 28px',
               }}
             />
-            <div className="relative z-10 w-full max-w-[420px] aspect-[3/4]">
+            <div className="relative z-10 w-full max-w-[280px] md:max-w-[420px] aspect-[3/4]">
               <Image
                 src={post.poster!}
                 alt="포스터"
                 fill
-                sizes="420px"
+                sizes="(max-width: 768px) 280px, 420px"
                 className="object-contain"
                 style={{ filter: 'drop-shadow(0 20px 48px rgba(0,0,0,0.22))' }}
               />
@@ -200,7 +201,7 @@ export default async function PostDetailPage({
           </div>
 
           {/* 사이드바 */}
-          <div className="w-[480px] bg-white border-l border-gray-200 flex flex-col flex-shrink-0">
+          <div className="w-full md:w-[480px] bg-white md:border-l border-t md:border-t-0 border-gray-200 flex flex-col md:flex-shrink-0">
             {/* accent 그라데이션 스트립 */}
             <div
               className="h-1 flex-shrink-0"
@@ -210,9 +211,9 @@ export default async function PostDetailPage({
             {/* 스크롤 영역 */}
             <div className="flex-1 overflow-y-auto min-h-0">
               {/* 타이틀 섹션 */}
-              <div className="px-8 pt-7 pb-6 border-b border-gray-100">
+              <div className="px-5 md:px-8 pt-6 md:pt-7 pb-6 border-b border-gray-100">
                 {badges}
-                <h1 className="text-[1.65rem] font-extrabold text-gray-900 leading-tight tracking-tight mt-4 mb-2.5">
+                <h1 className="text-2xl md:text-[1.65rem] font-extrabold text-gray-900 leading-tight tracking-tight mt-4 mb-2.5">
                   {post.title}
                 </h1>
                 <p className="text-gray-400 text-[13px] leading-relaxed whitespace-pre-wrap">
@@ -221,12 +222,12 @@ export default async function PostDetailPage({
               </div>
 
               {/* 통계 섹션 */}
-              <div className="px-8 py-6 space-y-5 border-b border-gray-100">
+              <div className="px-5 md:px-8 py-6 space-y-5 border-b border-gray-100">
                 {statsBlock}
               </div>
 
-              {/* 지원 섹션 — 스크롤 안에 위치, 펼쳐도 가림 없음 */}
-              <div className="px-8 py-6 space-y-2">
+              {/* 지원 섹션 */}
+              <div className="px-5 md:px-8 py-6 space-y-2">
                 <ApplyForm
                   postId={post.id}
                   roles={post.roles}
@@ -248,7 +249,7 @@ export default async function PostDetailPage({
                 )}
               </div>
 
-              <p className="px-8 pb-6 text-xs text-gray-300">
+              <p className="px-5 md:px-8 pb-6 text-xs text-gray-300">
                 등록 {new Date(post.createdAt).toLocaleDateString('ko-KR')}
               </p>
             </div>
@@ -271,7 +272,7 @@ export default async function PostDetailPage({
 
       {/* 헤더 밴드 */}
       <div className="bg-white border-b border-gray-200" style={{ borderTop: `4px solid ${accent}` }}>
-        <div className="max-w-5xl mx-auto px-6 py-5">
+        <div className="max-w-5xl mx-auto px-4 md:px-6 py-5">
           {badges}
           <h1 className="text-2xl font-extrabold text-gray-900 leading-tight tracking-tight mt-4 mb-2">
             {post.title}
@@ -283,7 +284,7 @@ export default async function PostDetailPage({
       </div>
 
       {/* 본문 2컬럼 */}
-      <div className="max-w-5xl mx-auto px-6 py-6">
+      <div className="max-w-5xl mx-auto px-4 md:px-6 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6 items-start">
 
           {/* 모집 정보 카드 */}

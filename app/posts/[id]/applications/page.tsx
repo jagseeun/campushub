@@ -75,14 +75,16 @@ export default async function ApplicationsPage({
                   </span>
 
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-2 flex-wrap">
-                      <span className="font-semibold text-gray-900">{app.name}</span>
-                      {app.roleWanted && (
-                        <span className="text-xs bg-brand-50 text-brand-700 px-2.5 py-0.5 rounded-full font-medium border border-brand-100">
-                          {app.roleWanted}
-                        </span>
-                      )}
-                      <span className="text-xs text-gray-400 ml-auto">
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-semibold text-gray-900">{app.name}</span>
+                        {app.roleWanted && (
+                          <span className="text-xs bg-brand-50 text-brand-700 px-2.5 py-0.5 rounded-full font-medium border border-brand-100">
+                            {app.roleWanted}
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-xs text-gray-400 shrink-0">
                         {new Date(app.createdAt).toLocaleDateString('ko-KR', {
                           month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
                         })}
