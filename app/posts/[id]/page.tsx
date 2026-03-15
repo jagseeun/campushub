@@ -177,7 +177,7 @@ export default async function PostDetailPage({
         <div className="flex flex-col md:flex-row md:flex-1 md:overflow-hidden">
           {/* 포스터 영역 */}
           <div
-            className="flex items-center justify-center relative overflow-hidden py-10 md:py-0 md:flex-1"
+            className="relative flex items-center justify-center overflow-hidden py-10 md:py-0 md:flex-1"
             style={{ background: `linear-gradient(135deg, ${accent}12 0%, #eef0f5 45%, ${accent}09 100%)` }}
           >
             <div
@@ -187,13 +187,13 @@ export default async function PostDetailPage({
                 backgroundSize: '28px 28px',
               }}
             />
-            <div className="relative z-10 w-full max-w-[260px] sm:max-w-[320px] md:max-w-[420px] aspect-[3/4]">
+            <div className="relative z-10 w-full max-w-[260px] sm:max-w-[320px] md:max-w-[420px]">
               <Image
                 src={post.poster!}
                 alt="포스터"
-                fill
-                sizes="(max-width: 640px) 260px, (max-width: 768px) 320px, 420px"
-                className="object-contain"
+                width={420}
+                height={560}
+                className="w-full h-auto object-contain"
                 style={{ filter: 'drop-shadow(0 20px 48px rgba(0,0,0,0.22))' }}
               />
             </div>
