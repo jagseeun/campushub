@@ -13,9 +13,6 @@ export default function Header({ right }: { right?: ReactNode }) {
         </Link>
         <div className="flex items-center gap-3">
           {right}
-          <Link href="/applications/check" className="text-sm text-gray-500 hover:text-brand-600 transition-colors hidden sm:block">
-            내 지원 결과
-          </Link>
           <AuthButton />
         </div>
       </div>

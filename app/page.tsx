@@ -59,13 +59,18 @@ export default async function HomePage({
     <div className="min-h-screen bg-[#F8F9FF]">
       <Header
         right={
-          <Link
-            href="/posts/new"
-            className="inline-flex items-center gap-1.5 bg-brand-600 text-white px-3 py-2 sm:px-4 rounded-xl text-sm font-semibold hover:bg-brand-700 transition-colors shadow-sm shadow-brand-200"
-          >
-            <IconPlus size={14} />
-            <span className="hidden sm:inline">모집글 작성</span>
-          </Link>
+          <>
+            <Link href="/applications/check" className="text-sm text-gray-500 hover:text-brand-600 transition-colors hidden sm:block">
+              내 지원 결과
+            </Link>
+            <Link
+              href="/posts/new"
+              className="inline-flex items-center gap-1.5 bg-brand-600 text-white px-3 py-2 sm:px-4 rounded-xl text-sm font-semibold hover:bg-brand-700 transition-colors shadow-sm shadow-brand-200"
+            >
+              <IconPlus size={14} />
+              <span className="hidden sm:inline">모집글 작성</span>
+            </Link>
+          </>
         }
       />
 
