@@ -48,6 +48,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const session = await auth()
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: '로그인이 필요합니다.' }, { status: 401 })
+  }
   const body = await request.json()
   const {
     type, title, field, capacity, current, deadline, description, poster,
@@ -89,7 +92,7 @@ export async function POST(request: NextRequest) {
       poster: type === 'club' && poster?.trim() ? poster.trim() : null,
       applyMode: applyMode === 'link' ? 'link' : 'form',
       applyLink: applyMode === 'link' && applyLink?.trim() ? applyLink.trim() : null,
-      creatorId: session?.user?.id ?? null,
+      creatorId: session.user.id,
       showApplicantCount: showApplicantCount !== false,
       roles:
         type === 'team' && Array.isArray(roles) && roles.length > 0

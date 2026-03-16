@@ -136,7 +136,7 @@ export default function ApplyForm({ postId, roles, isTeam, isClosed, applyMode, 
         <div className="border border-gray-200 rounded-xl overflow-hidden">
           <div className="bg-gray-50 border-b border-gray-200 px-5 py-3 flex items-center justify-between">
             <span className="text-gray-800 font-semibold text-sm">지원서 작성</span>
-            <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
+            <button onClick={() => { setOpen(false); setForm({ name: '', contact: '', roleWanted: '', message: '' }) }} className="text-gray-400 hover:text-gray-600 transition-colors">
               <IconX size={15} />
             </button>
           </div>

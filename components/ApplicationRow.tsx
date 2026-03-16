@@ -124,13 +124,6 @@ export default function ApplicationRow({ app, postId, idx, total }: Props) {
               {note && (
                 <p className="text-xs text-gray-400 italic flex-1">메모: {note}</p>
               )}
-              <button
-                onClick={() => update('pending')}
-                disabled={saving}
-                className="text-xs text-gray-400 hover:text-gray-600 underline underline-offset-2 disabled:opacity-40 transition-colors"
-              >
-                재검토
-              </button>
             </div>
           )}
         </div>

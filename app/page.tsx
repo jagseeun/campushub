@@ -8,6 +8,7 @@ import { IconPlus, IconSearch } from '@/components/Icons'
 import { prisma } from '@/lib/prisma'
 import { POST_TYPES, FIELDS } from '@/types'
 import { Prisma } from '@prisma/client'
+import { auth } from '@/auth'
 
 async function getPosts(searchParams: Record<string, string>) {
   const { type, field, filter, q } = searchParams
@@ -52,7 +53,7 @@ export default async function HomePage({
   searchParams: Promise<Record<string, string>>
 }) {
   const params = await searchParams
-  const posts = await getPosts(params)
+  const [posts, session] = await Promise.all([getPosts(params), auth()])
   const isFiltered = !!(params.type || params.field || params.filter || params.q)
 
   return (
@@ -63,13 +64,15 @@ export default async function HomePage({
             <Link href="/applications/check" className="text-sm text-gray-500 hover:text-brand-600 transition-colors hidden sm:block">
               내 지원 결과
             </Link>
-            <Link
-              href="/posts/new"
-              className="inline-flex items-center gap-1.5 bg-brand-600 text-white px-3 py-2 sm:px-4 rounded-xl text-sm font-semibold hover:bg-brand-700 transition-colors shadow-sm shadow-brand-200"
-            >
-              <IconPlus size={14} />
-              <span className="hidden sm:inline">모집글 작성</span>
-            </Link>
+            {session?.user && (
+              <Link
+                href="/posts/new"
+                className="inline-flex items-center gap-1.5 bg-brand-600 text-white px-3 py-2 sm:px-4 rounded-xl text-sm font-semibold hover:bg-brand-700 transition-colors shadow-sm shadow-brand-200"
+              >
+                <IconPlus size={14} />
+                <span className="hidden sm:inline">모집글 작성</span>
+              </Link>
+            )}
           </>
         }
       />

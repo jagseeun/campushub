@@ -40,13 +40,39 @@ export async function PATCH(
     pending: 'pending',
   }
 
-  const application = await prisma.application.update({
+  const existing = await prisma.application.findUnique({
     where: { id: applicationId, postId },
-    data: {
-      status: statusMap[action],
-      reviewNote: reviewNote?.trim() || null,
-    },
+    select: { status: true },
   })
+  if (!existing) {
+    return NextResponse.json({ error: '지원서를 찾을 수 없습니다.' }, { status: 404 })
+  }
+
+  const newStatus = statusMap[action]
+  const wasAccepted = existing.status === 'accepted'
+  const willBeAccepted = newStatus === 'accepted'
+
+  if (willBeAccepted && !wasAccepted && post.current >= post.capacity) {
+    return NextResponse.json({ error: '모집 인원이 이미 마감되었습니다.' }, { status: 400 })
+  }
+
+  const currentDelta = willBeAccepted && !wasAccepted ? 1
+    : !willBeAccepted && wasAccepted ? -1
+    : 0
+
+  const [application] = await prisma.$transaction([
+    prisma.application.update({
+      where: { id: applicationId, postId },
+      data: {
+        status: newStatus,
+        reviewNote: reviewNote?.trim() || null,
+      },
+    }),
+    ...(currentDelta !== 0 ? [prisma.post.update({
+      where: { id: postId },
+      data: { current: { increment: currentDelta } },
+    })] : []),
+  ])
 
   return NextResponse.json(application)
 }

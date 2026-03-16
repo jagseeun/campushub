@@ -3,9 +3,10 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Header from '@/components/Header'
 import ApplyForm from '@/components/ApplyForm'
+import DeletePostButton from '@/components/DeletePostButton'
 import {
   IconArrowLeft, IconBook, IconBuilding, IconUsers,
-  IconFlame, IconAlertCircle, IconCalendar, IconUsers as IconCount,
+  IconFlame, IconAlertCircle, IconCalendar, IconUsers as IconCount, IconEdit,
 } from '@/components/Icons'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
@@ -211,6 +212,17 @@ export default async function PostDetailPage({
             </Link>
           )}
         </div>
+        {isCreator && (
+          <div className="px-5 md:px-8 pb-2 flex gap-2">
+            <Link
+              href={`/posts/${post.id}/edit`}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+            >
+              <IconEdit size={13} />수정
+            </Link>
+            <DeletePostButton postId={post.id} />
+          </div>
+        )}
         <p className="px-5 md:px-8 pb-8 text-xs text-gray-300">
           등록 {new Date(post.createdAt).toLocaleDateString('ko-KR')}
         </p>
@@ -351,6 +363,17 @@ export default async function PostDetailPage({
                 </span>
                 <span className="text-base font-bold text-brand-600">{post._count.applications}명 지원</span>
               </Link>
+            )}
+            {isCreator && (
+              <div className="flex gap-2">
+                <Link
+                  href={`/posts/${post.id}/edit`}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                >
+                  <IconEdit size={13} />수정
+                </Link>
+                <DeletePostButton postId={post.id} />
+              </div>
             )}
           </div>
 

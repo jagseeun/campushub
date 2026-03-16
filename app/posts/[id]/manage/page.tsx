@@ -2,7 +2,8 @@ import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import ApplicationRow from '@/components/ApplicationRow'
-import { IconArrowLeft, IconUsers, IconCalendar } from '@/components/Icons'
+import DeletePostButton from '@/components/DeletePostButton'
+import { IconArrowLeft, IconUsers, IconCalendar, IconEdit } from '@/components/Icons'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
 
@@ -63,13 +64,22 @@ export default async function ManagePage({
         {/* 헤더 */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
           <div className="flex items-start justify-between gap-4">
-            <div>
+            <div className="flex-1 min-w-0">
               <p className="text-xs text-gray-400 mb-1 font-medium uppercase tracking-wide">지원자 관리</p>
               <h1 className="text-lg font-bold text-gray-900 leading-snug">{post.title}</h1>
             </div>
-            <div className="text-right shrink-0">
-              <p className="text-3xl font-black text-brand-600 leading-none">{apps.length}</p>
-              <p className="text-xs text-gray-400 mt-0.5">총 지원자</p>
+            <div className="flex items-center gap-2 shrink-0">
+              <Link
+                href={`/posts/${numId}/edit`}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+              >
+                <IconEdit size={13} />수정
+              </Link>
+              <DeletePostButton postId={numId} />
+              <div className="text-right">
+                <p className="text-3xl font-black text-brand-600 leading-none">{apps.length}</p>
+                <p className="text-xs text-gray-400 mt-0.5">총 지원자</p>
+              </div>
             </div>
           </div>
 
